@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "28983122953",
+    "firebase_url": "https://pseb-matq-default-rtdb.firebaseio.com",
+    "project_id": "pseb-matq",
+    "storage_bucket": "pseb-matq.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:28983122953:android:25f058435d079213afecd8",
+        "android_client_info": {
+          "package_name": "com.example.satya_new"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyACta_Jfbds1Yvb4jD4SbbBvwmV1XpDc18"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:28983122953:android:2b33048aaaa6b211afecd8",
+        "android_client_info": {
+          "package_name": "pseb.etma.pseb_etma"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyACta_Jfbds1Yvb4jD4SbbBvwmV1XpDc18"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
