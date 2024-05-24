@@ -177,7 +177,7 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Color(0xFF14B3B4),
+                    backgroundColor: Color(0xFF14B3B4),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0),
                     ),

@@ -185,7 +185,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                     updateMember();
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Color(0xFF14B3B4),
+                    backgroundColor: Color(0xFF14B3B4),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0),
                     ),
@@ -213,7 +213,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                     deleteMember();
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Color(0xFFE02626),
+                    backgroundColor: Color(0xFFE02626),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0),
                     ),

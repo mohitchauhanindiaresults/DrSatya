@@ -235,7 +235,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         // Handle button tap
       },
       style: ElevatedButton.styleFrom(
-        primary: color,
+        backgroundColor: color,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(15.0),
         ),

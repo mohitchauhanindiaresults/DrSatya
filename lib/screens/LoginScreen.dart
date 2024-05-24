@@ -118,7 +118,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 },
                 style: ElevatedButton.styleFrom(
-                  primary: Color(0xFF14B3B4),
+                  backgroundColor: Color(0xFF14B3B4),
                   // Use the same color as the gradient
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(
@@ -194,6 +194,7 @@ class _LoginScreenState extends State<LoginScreen> {
         print(message);
 
         if (status == "success") {
+          print("track1");
 
 
           String roll=profileDetails.user!.id.toString();
@@ -219,6 +220,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           );
         } else {
+          print("track2");
           pd.close(delay: 0);
           Utils.showAlertDialog(
               context, message);
@@ -232,6 +234,7 @@ class _LoginScreenState extends State<LoginScreen> {
           );
         }
       } else {
+        print("track3");
         pd.close(delay: 0);
         Fluttertoast.showToast(
           msg: "Internal Server Error",
@@ -243,16 +246,10 @@ class _LoginScreenState extends State<LoginScreen> {
         throw Exception('Login failed');
       }
     } catch (e) {
+      print("track4");
       print('Error: $e');
       pd.close(delay: 0);
-      Map<String, dynamic> response = json.decode(jsonResponseeee);
-
-      // Retrieve the value of the "message" key
-      String message = response['message'];
-
-      // Print the result
-      print('Message: $message');
-      Utils.showAlertDialog(context, message);
+      Utils.showAlertDialog(context, "Invalid credentials");
       throw Exception('An error occurred during login');
     }
   }
