@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:satya_new/screens/Billing/BillingSelection.dart';
+import 'package:satya_new/screens/Consultations/Consultations.dart';
 import 'package:satya_new/screens/Holistic%20history/HolisticSelection.dart';
 import 'package:satya_new/screens/Sales/SalesSelection.dart';
 import '../utils/Constant.dart';
@@ -222,7 +223,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
           );
 
         }if ("Consultations" == label) {
+          print("object");
 
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  Consultations(), // Replace AddMemberScreen with your actual screen class
+            ),
+          );
+          // Handle button tap
 
         }
         // Navigator.push(

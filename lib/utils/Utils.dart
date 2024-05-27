@@ -223,7 +223,10 @@ class Utils {
     DateTime currentDate = DateTime.now();
     return DateFormat('dd-MM-yyyy').format(currentDate);
   }
-
+  static String getCurrentFormattedTime() {
+    DateTime currentTime = DateTime.now();
+    return DateFormat('HH:mm:ss').format(currentTime);
+  }
 
   static void addAllUniqueClasses(String jsonResponse, List<String> dropdownItemList) {
     final decodedResponse = json.decode(jsonResponse);
