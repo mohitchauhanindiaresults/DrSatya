@@ -1,7 +1,5 @@
 import 'dart:convert';
-
 import 'package:dio/dio.dart';
-
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:sn_progress_dialog/progress_dialog.dart';
@@ -172,6 +170,9 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
                     } else if (passsword.text.isEmpty) {
                       Utils.showAlertDialog(
                           context, "Password field cannot be empty");
+                    } else if (passsword.text.length!=10) {
+                      Utils.showAlertDialog(
+                          context, "The mobile must be 10 digits.");
                     } else {
                       addMember(context);
                     }
