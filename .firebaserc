@@ -1,7 +1,8 @@
 {
   "projects": {
-    "default": "team-connect-d53f8",
-    "yes": "papercollectionprocess"
+    "default": "webhosting-1f885",
+    "yes": "papercollectionprocess",
+    "staging": "webhosting-1f885"
   },
   "targets": {},
   "etags": {}
