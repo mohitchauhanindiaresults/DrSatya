@@ -13,6 +13,7 @@ class AddMemberScreen extends StatefulWidget {
 }
 
 class _AddMemberScreenState extends State<AddMemberScreen> {
+
   // Define a controller for each text field
   TextEditingController roleController = TextEditingController();
   TextEditingController nameController = TextEditingController();

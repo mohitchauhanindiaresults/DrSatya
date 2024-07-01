@@ -1,4 +1,4 @@
-package com.example.satya_new;
+package com.satya.satya_new;
 
 import io.flutter.embedding.android.FlutterActivity;
 

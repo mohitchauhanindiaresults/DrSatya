@@ -6,7 +6,6 @@ import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:open_app_settings/open_app_settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Utils {
@@ -64,38 +63,6 @@ class Utils {
 
     // If the subName is not found, you can return a default value or handle it as needed.
     return -1; // Return -1 as an example for not found.
-  }
-  static void AlertGoToSetting(BuildContext context) {
-    showDialog(
-        context: context,
-        builder: (context) =>
-            AlertDialog(
-              title: Text('Alert'),
-              content: Text(
-                  "To enhance the security and authenticity of student examinations, the app requires access to your location and camera. These permissions are necessary for verifying teacher presence and identity during exams. Please enable both location and camera access to ensure a smooth and secure examination process. You can update these settings in your device's Settings app."),
-              actions: [
-                TextButton(
-                  child:
-                  Text('Close', style: TextStyle(color: Color(0xFF01579B))),
-                  // Negative button
-                  onPressed: () {
-                    // Close the dialog without performing any action
-                    exit(0);
-                  },
-                ),
-                TextButton(
-                  child: Text('I confirm',
-                      style: TextStyle(color: Color(0xFF01579B))),
-                  onPressed: () {
-                    // Close the dialog
-                    Navigator.of(context).pop();
-
-                    // Open app settings
-                    OpenAppSettings.openAppSettings();
-                  },
-                ),
-              ],
-            ));
   }
 
   static void PermisionAlert(BuildContext context) {

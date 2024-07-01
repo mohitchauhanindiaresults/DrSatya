@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "pseb-matq"
-  }
+    "default": "team-connect-d53f8",
+    "yes": "papercollectionprocess"
+  },
+  "targets": {},
+  "etags": {}
 }
