@@ -494,9 +494,7 @@ class _AddEnquiryScreenState extends State<AddEnquiryScreen> {
                       ),
                       SizedBox(height: 15.0),
                       DropdownButtonFormField<String>(
-                        value: sourceController.text.isNotEmpty
-                            ? sourceController.text
-                            : null,
+                        value: sourceController.text.isNotEmpty ? sourceController.text : null,
                         onChanged: (String? value) {
                           setState(() {
                             sourceController.text = value!;

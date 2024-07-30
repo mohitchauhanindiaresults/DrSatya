@@ -1,14 +1,15 @@
-import 'dart:convert';
 
-import 'package:dio/dio.dart';
+import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:sn_progress_dialog/progress_dialog.dart';
-
+import 'package:http/http.dart' as http;
 import '../model/LoginApiModel.dart';
 import '../utils/Constant.dart';
 import '../utils/Utils.dart';
 import 'DashboardScreen.dart';
+
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -113,9 +114,15 @@ class _LoginScreenState extends State<LoginScreen> {
               // Login button
               ElevatedButton(
                 onPressed: () {
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(
+                  //     builder: (context) => DashboardScreen(),
+                  //   ),
+                  // );
+                //  Fluttertoast.showToast(msg: "Login sucessfully");
                   loginApi(context);
-
-
+                  
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color(0xFF14B3B4),
@@ -140,8 +147,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
               ),
-
-
             ],
           ),
         ),
@@ -152,9 +157,11 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> initate() async {
     bool isNetworkAvailable = await Utils.checkNetworkStatus();
 
-    emailController.text = (await Utils.getStringFromPrefs(Constant.EMAIL))!;
-    passwordcontroller.text = (await Utils.getStringFromPrefs(Constant.PASSWORD))!;
+    emailController.text = (await Utils.getStringFromPrefs(Constant.EMAIL)) ?? '';
+    passwordcontroller.text = (await Utils.getStringFromPrefs(Constant.PASSWORD)) ?? '';
+
     if (isNetworkAvailable) {
+
     } else {
 
       // Show an error message or perform an action if there is no network
@@ -166,53 +173,55 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> loginApi(BuildContext context) async {
     ProgressDialog pd = ProgressDialog(context: context);
     pd.show(msg: "Please Wait");
-    String message = "";
-    final Dio dio = Dio();
     LoginApiModel? profileDetails;
+
+    String message = "";
     final data = {
       "mobile": emailController.text,
       "password": passwordcontroller.text,
     };
-    print(data);
-    String error = "";
+    print("Login data: $data");
+
     try {
-      final response =
-          await dio.post(Constant.BASE_URL + "api/login", data: data);
+      final response = await http.post(
+        Uri.parse(Constant.BASE_URL + "api/login"),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: json.encode(data),
+      );
 
       if (response.statusCode == 200) {
         pd.close(delay: 0);
-        final jsonResponse = response.data;
-        Utils.printLongString(response.toString());
-        jsonResponseeee = response.toString();
+        final jsonResponse = json.decode(response.body);
+        print("Response JSON: $jsonResponse");
 
-        Map<String, dynamic> responseMap = json.decode(response.toString());
-        profileDetails = LoginApiModel.fromJson(responseMap);
-
+        profileDetails = LoginApiModel.fromJson(jsonResponse);
         message = profileDetails.message.toString();
         String? status = profileDetails.status;
 
-        print(message);
+        print("Message: $message");
 
         if (status == "success") {
           print("track1");
 
-
-          String roll=profileDetails.user!.id.toString();
-          Utils.saveStringToPrefs(Constant.USER_ID,profileDetails.user!.id.toString());
-          Utils.saveStringToPrefs(Constant.ROLL_ID,roll);
-          Utils.saveStringToPrefs(Constant.NAME,profileDetails.user!.name.toString());
-          Utils.saveStringToPrefs(Constant.TOKEN,profileDetails.user!.accessToken.toString());
-          Utils.saveStringToPrefs(Constant.DESIGNATION,profileDetails.user!.designation.toString());
-          Utils.saveStringToPrefs(Constant.PASSWORD,passwordcontroller.text);
-          Utils.saveStringToPrefs(Constant.EMAIL,emailController.text);
-    //      Utils.saveStringToPrefs(Constant.ROLES,profileDetails.user!.roles!.name.toString());
+          // Save user details in shared preferences
+          String roll = profileDetails.user!.id.toString();
+          Utils.saveStringToPrefs(Constant.USER_ID, profileDetails.user!.id.toString());
+          Utils.saveStringToPrefs(Constant.ROLL_ID, roll);
+          Utils.saveStringToPrefs(Constant.NAME, profileDetails.user!.name.toString());
+          Utils.saveStringToPrefs(Constant.TOKEN, profileDetails.user!.accessToken.toString());
+          Utils.saveStringToPrefs(Constant.DESIGNATION, profileDetails.user!.designation.toString());
+          Utils.saveStringToPrefs(Constant.PASSWORD, passwordcontroller.text);
+          Utils.saveStringToPrefs(Constant.EMAIL, emailController.text);
 
           Fluttertoast.showToast(
-              msg: message,
-              toastLength: Toast.LENGTH_SHORT,
-              gravity: ToastGravity.BOTTOM,
-              backgroundColor: Colors.grey,
-              textColor: Colors.white);
+            msg: message,
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            backgroundColor: Colors.grey,
+            textColor: Colors.white,
+          );
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -220,10 +229,10 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           );
         } else {
+          // Handle non-successful status
           print("track2");
           pd.close(delay: 0);
-          Utils.showAlertDialog(
-              context, message);
+          Utils.showAlertDialog(context, message);
 
           Fluttertoast.showToast(
             msg: message,
@@ -236,6 +245,9 @@ class _LoginScreenState extends State<LoginScreen> {
       } else {
         print("track3");
         pd.close(delay: 0);
+        print("Error: ${response.statusCode}");
+        print("Response body: ${response.body}");
+
         Fluttertoast.showToast(
           msg: "Internal Server Error",
           toastLength: Toast.LENGTH_SHORT,
@@ -243,13 +255,22 @@ class _LoginScreenState extends State<LoginScreen> {
           backgroundColor: Colors.grey,
           textColor: Colors.white,
         );
-        throw Exception('Login failed');
+        throw Exception('Login failed: ${response.reasonPhrase}');
       }
     } catch (e) {
       print("track4");
       print('Error: $e');
       pd.close(delay: 0);
-      Utils.showAlertDialog(context, "Invalid credentials");
+
+      // More specific error handling
+      if (e is SocketException) {
+        Utils.showAlertDialog(context, "Network Error: ${e.message}");
+      } else if (e is FormatException) {
+        Utils.showAlertDialog(context, "Response Parsing Error: ${e.message}");
+      } else {
+        Utils.showAlertDialog(context, "An unexpected error occurred: ${e.toString()}");
+      }
+
       throw Exception('An error occurred during login');
     }
   }

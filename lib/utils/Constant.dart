@@ -1,5 +1,5 @@
 class Constant {
-  static const String BASE_URL = 'https://clients.charumindworks.com/satya/';
+  static const String BASE_URL = 'http://clients.charumindworks.com/satya/';
   static const String NAME = 'name';
   static const String EMAIL = 'email';
   static const String MOBILE = 'mobile';

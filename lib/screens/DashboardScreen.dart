@@ -6,6 +6,7 @@ import 'package:satya_new/screens/Billing/BillingSelection.dart';
 import 'package:satya_new/screens/Consultations/Consultations.dart';
 import 'package:satya_new/screens/Holistic%20history/HolisticSelection.dart';
 import 'package:satya_new/screens/Sales/SalesSelection.dart';
+import 'package:satya_new/screens/Yoga/AddYogaMember.dart';
 import '../utils/Constant.dart';
 import '../utils/Utils.dart';
 import 'AddMemberScreen.dart';
@@ -234,6 +235,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
           );
           // Handle button tap
 
+        }if ("Yoga" == label) {
+          print("object");
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  AddYogaMemberScreen(), // Replace AddMemberScreen with your actual screen class
+            ),
+          );
+          // Handle button tap
+
         }
         // Navigator.push(
         //   context,
@@ -275,8 +288,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
     void initate() async {
+    try{
       name = (await Utils.getStringFromPrefs(Constant.EMAIL))!;
       role = (await Utils.getStringFromPrefs(Constant.NAME))!;
+    }catch(e){
+      print(e);
+    }
+
+
       setState(() {});
 
       Timer(Duration(milliseconds: 50), () async {
