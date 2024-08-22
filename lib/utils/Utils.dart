@@ -118,7 +118,13 @@ class Utils {
     // Use the RegExp's hasMatch method to check if the password matches the pattern
     return regex.hasMatch(password);
   }
-
+  static void navigateToPage(BuildContext context, Widget page) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => page,
+      ),
+    );
+  }
  static Future<bool> checkNetworkStatus() async {
     try {
       final result = await InternetAddress.lookup('google.com');

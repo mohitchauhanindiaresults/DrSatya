@@ -2,21 +2,21 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
-class MemberListing extends StatefulWidget {
+class AttendanceListing extends StatefulWidget {
   @override
-  _MemberListingState createState() => _MemberListingState();
+  _AttendanceListingState createState() => _AttendanceListingState();
 }
 
-class _MemberListingState extends State<MemberListing> {
-  late Future<Map<String, dynamic>> memberDetails;
-  String selectedStatus = '';
-  String selectedTrainingMode = '';
-  String selectedPackageType = '';
+class _AttendanceListingState extends State<AttendanceListing> {
+  late Future<Map<String, dynamic>> attendanceDetails;
+  String selectedType = '';
+  String selectedMode = '';
+  String selectedCentre = '';
 
   @override
   void initState() {
     super.initState();
-    memberDetails = fetchMemberDetails();
+    attendanceDetails = fetchAttendanceDetails();
   }
 
   @override
@@ -25,7 +25,7 @@ class _MemberListingState extends State<MemberListing> {
       appBar: AppBar(
         backgroundColor: Color(0xFF14B3B4),
         title: Text(
-          'Member List',
+          'Attendance List',
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
@@ -47,12 +47,44 @@ class _MemberListingState extends State<MemberListing> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-
+                _buildFilterDropdown(
+                  title: 'Type',
+                  value: selectedType,
+                  items: ['new member', 'current member'],
+                  onChanged: (value) {
+                    setState(() {
+                      selectedType = value;
+                      attendanceDetails = fetchAttendanceDetails();
+                    });
+                  },
+                ),
+                _buildFilterDropdown(
+                  title: 'Mode',
+                  value: selectedMode,
+                  items: ['online', 'home', 'center'],
+                  onChanged: (value) {
+                    setState(() {
+                      selectedMode = value;
+                      attendanceDetails = fetchAttendanceDetails();
+                    });
+                  },
+                ),
+                _buildFilterDropdown(
+                  title: 'Centre',
+                  value: selectedCentre,
+                  items: ['sitapura', 'shalimar'],
+                  onChanged: (value) {
+                    setState(() {
+                      selectedCentre = value;
+                      attendanceDetails = fetchAttendanceDetails();
+                    });
+                  },
+                ),
               ],
             ),
             Expanded(
               child: FutureBuilder<Map<String, dynamic>>(
-                future: memberDetails,
+                future: attendanceDetails,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Center(
@@ -63,37 +95,35 @@ class _MemberListingState extends State<MemberListing> {
                       child: Text('Error loading data'),
                     );
                   } else {
-                    List<dynamic> memberList = snapshot.data!['members'];
+                    List<dynamic> attendanceList = snapshot.data!['members'];
 
                     // Debug print to check loaded data
-                    print("Loaded member data: $memberList");
+                    print("Loaded attendance data: $attendanceList");
 
-                    // Filter memberList based on selected filters
-                    memberList = memberList
-                        .where((member) {
-                      print("Filtering member: $member"); // Debug print for each member
-                      return (selectedStatus.isEmpty || member['status'] == selectedStatus) &&
-                          (selectedTrainingMode.isEmpty || member['training_mode'] == selectedTrainingMode) &&
-                          (selectedPackageType.isEmpty || member['package_type'] == selectedPackageType);
-                    })
-                        .toList();
+                    // Filter attendanceList based on selected filters
+                    attendanceList = attendanceList.where((attendance) {
+                      print("Filtering attendance: $attendance"); // Debug print for each attendance
+                      return (selectedType.isEmpty || attendance['type'] == selectedType) &&
+                          (selectedMode.isEmpty || attendance['mode'] == selectedMode) &&
+                          (selectedCentre.isEmpty || attendance['centre'] == selectedCentre);
+                    }).toList();
 
                     // Debug print to check filtered list
-                    print("Filtered member list: $memberList");
+                    print("Filtered attendance list: $attendanceList");
 
-                    if (memberList.isEmpty) {
+                    if (attendanceList.isEmpty) {
                       return Center(
                         child: Text(
-                          'No members found for the selected filters.',
+                          'No attendance records found for the selected filters.',
                           style: TextStyle(color: Colors.white),
                         ),
                       );
                     }
 
                     return ListView.builder(
-                      itemCount: memberList.length,
+                      itemCount: attendanceList.length,
                       itemBuilder: (context, index) {
-                        Map<String, dynamic> member = memberList[index];
+                        Map<String, dynamic> attendance = attendanceList[index];
 
                         return Column(
                           children: [
@@ -101,20 +131,12 @@ class _MemberListingState extends State<MemberListing> {
                               title: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  _buildText('First Name', member['first_name']),
-                                  _buildText('Last Name', member['last_name']),
-                                  _buildText('Mobile', member['mobile']),
-                                  _buildText('Alternative Mobile', member['alternative_mobile']),
-                                  _buildText('Training Mode', member['training_mode']),
-                                  _buildText('Training Type', member['training_type']),
-                                  _buildText('Package Type', member['package_type']),
-                                  _buildText('Package Start Date', member['package_start_date']),
-                                  _buildText('Package End Date', member['package_end_date']),
-                                  _buildText('Purpose', member['purpose']),
-                                  _buildText('Batch Time', member['batch_time']),
-                                  _buildText('Health Issue', member['health_issue']),
-                                  _buildText('Extension', member['extension']),
-                                  _buildText('Status', member['status']),
+                                  _buildText('Date', attendance['date']),
+                                  _buildText('Type', attendance['type']),
+                                  _buildText('Mode', attendance['mode']),
+                                  _buildText('Centre', attendance['centre']),
+                                  _buildText('Remark', attendance['remark']),
+                                  _buildText('Teacher', attendance['teacher']),
                                 ],
                               ),
                               onTap: () {
@@ -188,8 +210,8 @@ class _MemberListingState extends State<MemberListing> {
     );
   }
 
-  Future<Map<String, dynamic>> fetchMemberDetails() async {
-    const apiEndpoint = 'https://clients.charumindworks.com/satya/api/memberlist';
+  Future<Map<String, dynamic>> fetchAttendanceDetails() async {
+    const apiEndpoint = 'https://clients.charumindworks.com/satya/api/attendancelist';
 
     try {
       final response = await Dio().get(apiEndpoint);

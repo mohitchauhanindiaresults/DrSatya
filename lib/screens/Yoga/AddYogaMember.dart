@@ -1,8 +1,11 @@
 import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:satya_new/screens/DashboardScreen.dart';
+import 'package:satya_new/screens/Yoga/AddAttendanceScreen.dart';
+import 'package:satya_new/screens/Yoga/AddFollowupScreen.dart';
 import 'package:satya_new/utils/Utils.dart';
 import 'package:sn_progress_dialog/progress_dialog.dart';
 
@@ -93,10 +96,69 @@ class _AddYogaMemberScreenState extends State<AddYogaMemberScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                SizedBox(height: 50.0),
+                SizedBox(height: 20.0),
                 Form(
                   child: Column(
                     children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+
+                              Utils.navigateToPage(context, AddAttendanceScreen());
+
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Color(0xFF14B3B4),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
+                              elevation: 5,
+                              shadowColor: Colors.grey,
+                              padding: EdgeInsets.symmetric(vertical: 7.0, horizontal: 30.0),
+                            ),
+                            child: Text(
+                              'Attendance',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 15),
+                            child: ElevatedButton(
+                              onPressed: () {
+
+                                Utils.navigateToPage(context, AddFollowupScreen());
+
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Color(0xFF14B3B4),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                                elevation: 5,
+                                shadowColor: Colors.grey,
+                                padding: EdgeInsets.symmetric(vertical: 7.0, horizontal: 30.0),
+                              ),
+                              child: Text(
+                                'Follow up',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 20.0),
+
+
                       buildTextFormField(firstNameController, 'First Name'),
                       buildTextFormField(lastNameController, 'Last Name'),
                       buildTextFormField(mobileController, 'Mobile'),
@@ -284,3 +346,7 @@ class _AddYogaMemberScreenState extends State<AddYogaMemberScreen> {
     }
   }
 }
+
+
+
+
