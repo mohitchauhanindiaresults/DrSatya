@@ -72,13 +72,14 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
                         },
                         items: [
                           'Super Admin',
-                          'Center Head',
-                          'Office Coordinator',
-                          'Receptionist',
-                          'Doctor',
-                          'Holistic Counselor',
-                          'Sales Executive',
-                          'Yoga Teacher'
+                          // 'Center Head',
+                          // 'Office Coordinator',
+                          'Coordinator',
+                          // 'Receptionist',
+                          // 'Doctor',
+                          // 'Holistic Counselor',
+                          // 'Sales Executive',
+                          // 'Yoga Teacher'
                         ].map((String value) {
                           return DropdownMenuItem<String>(
                             value: value,

@@ -206,7 +206,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   SalesSelection(), // Replace AddMemberScreen with your actual screen class
             ),
           );
-        } if ("Billing & Registration" == label) {
+        } if ("Billing" == label) {
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -320,11 +320,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
         addIfValid("1", "Add Users");
         addIfValid("2", "Master Data");
         addIfValid("3", "Sales");
-        addIfValid("4", "Billing & Registration");
+        addIfValid("4", "Billing");
        // addIfValid("5", "Registration");
       //  addIfValid("6", "Consultations");
         addIfValid("7", "Yoga");
-   //     addIfValid("8", "Therapy");
+       // addIfValid("8", "Therapy");
      //   addIfValid("9", "Programs");
    //     addIfValid("10", "Events");
     //    addIfValid("11", "Courses");
@@ -332,12 +332,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
      //   addIfValid("13", "Uniqueness");
       //  addIfValid("14", "Holistic History");
      //   addIfValid("15", "Office Administration");
-    //    addIfValid("16", "Accounts");
+       addIfValid("16", "Accounts");
     //    addIfValid("17", "HR");
      //   addIfValid("18", "Customer Care");
      //   addIfValid("19", "Trainings");
         addIfValid("20", "Reports");
-       // addIfValid("21", "Follow-up");
+        addIfValid("21", "Follow-up");
 
         setState(() {});
         print(buttonLabels);
