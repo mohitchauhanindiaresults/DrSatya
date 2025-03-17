@@ -1,6 +1,7 @@
 class Constant {
   static const String BASE_URL = 'http://clients.charumindworks.com/satya/';
-  static const String NAME = 'name';
+  static const String BASE_URL_2 = "https://clients.charumindworks.com/satya/api/";
+      static const String NAME = 'name';
   static const String EMAIL = 'email';
   static const String MOBILE = 'mobile';
   static const String ROLL = 'roll';
@@ -12,7 +13,9 @@ class Constant {
   static const String MEMBER_API = 'MEMBER_API';
   static const String USER_ID = 'USER_ID';
   static const String PROGRAM_API = 'PROGRAM_API';
-
+  static const String FETCH_COUNTRY = 'fetch-country';
+  static const String FETCH_STATES = 'fetch-state';
+  static const String FETCH_CITY = 'fetch-city';
 
 
 }

@@ -1,11 +1,13 @@
 
 import 'dart:convert';
 import 'dart:io';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:sn_progress_dialog/progress_dialog.dart';
 import 'package:http/http.dart' as http;
 import '../model/LoginApiModel.dart';
+import '../utils/ApiInterceptor.dart';
 import '../utils/Constant.dart';
 import '../utils/Utils.dart';
 import 'DashboardScreen.dart';
@@ -21,6 +23,8 @@ TextEditingController passwordcontroller = TextEditingController();
 String jsonResponseeee='';
 
 class _LoginScreenState extends State<LoginScreen> {
+  final Dio _dio = ApiInterceptor.createDio(); // Use ApiInterceptor to create Dio instance
+
   @override
   void initState() {
     // TODO: implement initState
@@ -170,6 +174,112 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  // Future<void> loginApi(BuildContext context) async {
+  //   ProgressDialog pd = ProgressDialog(context: context);
+  //   pd.show(msg: "Please Wait");
+  //   LoginApiModel? profileDetails;
+  //
+  //   String message = "";
+  //   final data = {
+  //     "mobile": emailController.text,
+  //     "password": passwordcontroller.text,
+  //   };
+  //   print("Login data: $data");
+  //
+  //   try {
+  //     final response = await http.post(
+  //       Uri.parse(Constant.BASE_URL + "api/login"),
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: json.encode(data),
+  //     );
+  //
+  //     if (response.statusCode == 200) {
+  //       pd.close(delay: 0);
+  //       final jsonResponse = json.decode(response.body);
+  //       print("Response JSON: $jsonResponse");
+  //
+  //       profileDetails = LoginApiModel.fromJson(jsonResponse);
+  //       message = profileDetails.message.toString();
+  //       String? status = profileDetails.status;
+  //
+  //       print("Message: $message");
+  //
+  //       if (status == "success") {
+  //         print("track1");
+  //
+  //         // Save user details in shared preferences
+  //         String roll = profileDetails.user!.id.toString();
+  //         Utils.saveStringToPrefs(Constant.USER_ID, profileDetails.user!.id.toString());
+  //         Utils.saveStringToPrefs(Constant.ROLL_ID, roll);
+  //         Utils.saveStringToPrefs(Constant.NAME, profileDetails.user!.name.toString());
+  //         Utils.saveStringToPrefs(Constant.TOKEN, profileDetails.user!.accessToken.toString());
+  //         Utils.saveStringToPrefs(Constant.DESIGNATION, profileDetails.user!.designation.toString());
+  //         Utils.saveStringToPrefs(Constant.PASSWORD, passwordcontroller.text);
+  //         Utils.saveStringToPrefs(Constant.EMAIL, emailController.text);
+  //
+  //         Fluttertoast.showToast(
+  //           msg: message,
+  //           toastLength: Toast.LENGTH_SHORT,
+  //           gravity: ToastGravity.BOTTOM,
+  //           backgroundColor: Colors.grey,
+  //           textColor: Colors.white,
+  //         );
+  //         Navigator.push(
+  //           context,
+  //           MaterialPageRoute(
+  //             builder: (context) => DashboardScreen(),
+  //           ),
+  //         );
+  //       } else {
+  //         // Handle non-successful status
+  //         print("track2");
+  //         pd.close(delay: 0);
+  //         Utils.showAlertDialog(context, message);
+  //
+  //         Fluttertoast.showToast(
+  //           msg: message,
+  //           toastLength: Toast.LENGTH_SHORT,
+  //           gravity: ToastGravity.BOTTOM,
+  //           backgroundColor: Colors.grey,
+  //           textColor: Colors.white,
+  //         );
+  //       }
+  //     } else {
+  //       print("track3");
+  //       pd.close(delay: 0);
+  //       print("Error: ${response.statusCode}");
+  //       print("Response body: ${response.body}");
+  //
+  //       Fluttertoast.showToast(
+  //         msg: "Internal Server Error",
+  //         toastLength: Toast.LENGTH_SHORT,
+  //         gravity: ToastGravity.BOTTOM,
+  //         backgroundColor: Colors.grey,
+  //         textColor: Colors.white,
+  //       );
+  //       throw Exception('Login failed: ${response.reasonPhrase}');
+  //     }
+  //   } catch (e) {
+  //     print("track4");
+  //     print('Error: $e');
+  //     pd.close(delay: 0);
+  //
+  //     // More specific error handling
+  //     if (e is SocketException) {
+  //       Utils.showAlertDialog(context, "Network Error: ${e.message}");
+  //     } else if (e is FormatException) {
+  //       Utils.showAlertDialog(context, "Response Parsing Error: ${e.message}");
+  //     } else {
+  //       Utils.showAlertDialog(context, "An unexpected error occurred: ${e.toString()}");
+  //     }
+  //
+  //     throw Exception('An error occurred during login');
+  //   }
+  // }
+
+
   Future<void> loginApi(BuildContext context) async {
     ProgressDialog pd = ProgressDialog(context: context);
     pd.show(msg: "Please Wait");
@@ -180,20 +290,21 @@ class _LoginScreenState extends State<LoginScreen> {
       "mobile": emailController.text,
       "password": passwordcontroller.text,
     };
+
     print("Login data: $data");
 
     try {
-      final response = await http.post(
-        Uri.parse(Constant.BASE_URL + "api/login"),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: json.encode(data),
+      final response = await _dio.post(
+        "${Constant.BASE_URL}api/login",
+        options: Options(
+          headers: {'Content-Type': 'application/json'},
+        ),
+        data: data,
       );
 
       if (response.statusCode == 200) {
         pd.close(delay: 0);
-        final jsonResponse = json.decode(response.body);
+        final jsonResponse = response.data;
         print("Response JSON: $jsonResponse");
 
         profileDetails = LoginApiModel.fromJson(jsonResponse);
@@ -222,14 +333,13 @@ class _LoginScreenState extends State<LoginScreen> {
             backgroundColor: Colors.grey,
             textColor: Colors.white,
           );
-          Navigator.push(
+          Navigator.pushReplacement(
             context,
             MaterialPageRoute(
               builder: (context) => DashboardScreen(),
             ),
           );
         } else {
-          // Handle non-successful status
           print("track2");
           pd.close(delay: 0);
           Utils.showAlertDialog(context, message);
@@ -246,7 +356,7 @@ class _LoginScreenState extends State<LoginScreen> {
         print("track3");
         pd.close(delay: 0);
         print("Error: ${response.statusCode}");
-        print("Response body: ${response.body}");
+        print("Response body: ${response.data}");
 
         Fluttertoast.showToast(
           msg: "Internal Server Error",
@@ -255,7 +365,7 @@ class _LoginScreenState extends State<LoginScreen> {
           backgroundColor: Colors.grey,
           textColor: Colors.white,
         );
-        throw Exception('Login failed: ${response.reasonPhrase}');
+        throw Exception('Login failed: ${response.statusMessage}');
       }
     } catch (e) {
       print("track4");
@@ -263,10 +373,20 @@ class _LoginScreenState extends State<LoginScreen> {
       pd.close(delay: 0);
 
       // More specific error handling
-      if (e is SocketException) {
-        Utils.showAlertDialog(context, "Network Error: ${e.message}");
-      } else if (e is FormatException) {
-        Utils.showAlertDialog(context, "Response Parsing Error: ${e.message}");
+      if (e is DioError) {
+        if (e.error is SocketException) {
+          Utils.showAlertDialog(context, "Network Error: ${e.message}");
+        }
+        else if (e.type == DioErrorType.receiveTimeout) {
+          Utils.showAlertDialog(context, "Server Error: ${e.response?.statusMessage}");
+        }
+        else if (e.type == DioErrorType.connectTimeout ||
+            e.type == DioErrorType.receiveTimeout) {
+          Utils.showAlertDialog(context, "Request Timeout");
+        }
+        else {
+          Utils.showAlertDialog(context, "An unexpected error occurred: ${e.message}");
+        }
       } else {
         Utils.showAlertDialog(context, "An unexpected error occurred: ${e.toString()}");
       }
@@ -274,4 +394,5 @@ class _LoginScreenState extends State<LoginScreen> {
       throw Exception('An error occurred during login');
     }
   }
+
 }

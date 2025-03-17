@@ -172,9 +172,6 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
                     } else if (passsword.text.isEmpty) {
                       Utils.showAlertDialog(
                           context, "Password field cannot be empty");
-                    } else if (passsword.text.length!=10) {
-                      Utils.showAlertDialog(
-                          context, "The mobile must be 10 digits.");
                     } else {
                       addMember(context);
                     }

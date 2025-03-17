@@ -49,15 +49,22 @@ class Utils {
   static int getIdBySubName(String jsonResponse, String subName) {
     final decodedResponse = json.decode(jsonResponse);
 
-    if (decodedResponse['data'] != null &&
-        decodedResponse['data']['data'] != null &&
-        decodedResponse['data']['data']['PacketInBankClasswise'] != null) {
-      final packetInBankClasswise = decodedResponse['data']['data']['PacketInBankClasswise'];
+    final packetInBankClasswise = decodedResponse['country'];
+    for (var packet in packetInBankClasswise) {
+      if (packet['name'] == subName) {
+        return packet['id'];
+      }
+    }
 
-      for (var packet in packetInBankClasswise) {
-        if (packet['subName'] == subName) {
-          return packet['id'];
-        }
+    // If the subName is not found, you can return a default value or handle it as needed.
+    return -1; // Return -1 as an example for not found.
+  } static int getIdBySubNameState(String jsonResponse, String subName) {
+    final decodedResponse = json.decode(jsonResponse);
+
+    final packetInBankClasswise = decodedResponse['state'];
+    for (var packet in packetInBankClasswise) {
+      if (packet['name'] == subName) {
+        return packet['id'];
       }
     }
 

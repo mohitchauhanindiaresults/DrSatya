@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:satya_new/screens/Billing/BillingSelection.dart';
@@ -7,6 +8,7 @@ import 'package:satya_new/screens/Consultations/Consultations.dart';
 import 'package:satya_new/screens/Holistic%20history/HolisticSelection.dart';
 import 'package:satya_new/screens/Sales/SalesSelection.dart';
 import 'package:satya_new/screens/Yoga/AddYogaMember.dart';
+import '../utils/ApiInterceptor.dart';
 import '../utils/Constant.dart';
 import '../utils/Utils.dart';
 import 'AddMemberScreen.dart';
@@ -44,6 +46,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     Icons.report_sharp,
     Icons.follow_the_signs,
   ];
+  final Dio _dio = ApiInterceptor.createDio(); // Use ApiInterceptor to create Dio instance
 
   @override
   void initState() {

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:sn_progress_dialog/progress_dialog.dart';
 
+import '../utils/ApiInterceptor.dart';
 import '../utils/Constant.dart';
 import '../utils/Utils.dart';
 import 'DashboardScreen.dart';
@@ -20,6 +21,7 @@ class UpdateEnquiryScreen extends StatefulWidget {
 
 class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
   late Future<Map<String, dynamic>> employeeDetails;
+  final Dio _dio = ApiInterceptor.createDio(); // Use ApiInterceptor to create Dio instance
 
   TextEditingController centerController = TextEditingController();
   TextEditingController firstNameController = TextEditingController();
@@ -44,97 +46,175 @@ class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
   List<String> states = [];
   List<String> cities = [];
 
+  String countryJson = '';
+  String statesJson = '';
+  String cityJson = '';
+
   String selectedCountry = '';
   String selectedState = '';
   String selectedCity = '';
   String apiToken = ""; // Variable to store the obtained API token
 
-  Future<void> getAccessToken() async {
-    final response = await http.get(
-      Uri.parse("https://www.universal-tutorial.com/api/getaccesstoken"),
-      headers: {
-        "Accept": "application/json",
-        "api-token":
-        "wvjt4YD27Xb6yudVaAP1pkoL1iTXDO8ekg3NaJN9aw3tRk41udDhWndnEyhqd0Ewzf0",
-        "user-email": "mohit.chauhan@indiaresults.com",
-      },
-    );
+//   Future<void> getAccessToken() async {
+//     final response = await http.get(
+//       Uri.parse("https://www.universal-tutorial.com/api/getaccesstoken"),
+//       headers: {
+//         "Accept": "application/json",
+//         "api-token":
+//         "wvjt4YD27Xb6yudVaAP1pkoL1iTXDO8ekg3NaJN9aw3tRk41udDhWndnEyhqd0Ewzf0",
+//         "user-email": "mohit.chauhan@indiaresults.com",
+//       },
+//     );
+//
+//     if (response.statusCode == 200) {
+//       final Map<String, dynamic> data = json.decode(response.body);
+//       apiToken = data['auth_token'].toString();
+//     } else {
+//       throw Exception('Failed to get access token');
+//     }
+//   }
+//
+//   // Function to fetch countries from API using the obtained token
+//   Future<void> fetchCountries() async {
+// //    await getAccessToken();
+//
+//     final response = await http.get(
+//       Uri.parse("https://www.universal-tutorial.com/api/countries/"),
+//       headers: {
+//         "Authorization": "Bearer $apiToken",
+//         "Accept": "application/json",
+//       },
+//     );
+//
+//     if (response.statusCode == 200) {
+//       final List<dynamic> data = json.decode(response.body);
+//
+//       // Convert the list to a set to remove duplicates and then back to a list
+//       final uniqueCountriesSet =
+//       data.map((item) => item['country_name'].toString()).toSet();
+//       setState(() {
+//         countries = uniqueCountriesSet.toList();
+//       });
+//       print(countries);
+//     } else {
+//       throw Exception('Failed to load countries');
+//     }
+//   }
+//
+//   // Function to fetch states from API based on the selected country
+//   Future<void> fetchStates(String country) async {
+//     final response = await http.get(
+//       Uri.parse("https://www.universal-tutorial.com/api/states/$country"),
+//       headers: {
+//         "Authorization": "Bearer $apiToken",
+//         "Accept": "application/json",
+//       },
+//     );
+//     if (response.statusCode == 200) {
+//       final List<dynamic> data = json.decode(response.body);
+//       setState(() {
+//         states = data.map((item) => item['state_name'].toString()).toList();
+//       });
+//       print(states);
+//     } else {
+//       throw Exception('Failed to load states');
+//     }
+//   }
+//
+//   // Function to fetch cities from API based on the selected state
+//   Future<void> fetchCities(String state) async {
+//
+//     final response = await http.get(
+//       Uri.parse("https://www.universal-tutorial.com/api/cities/$state"),
+//       headers: {
+//         "Authorization": "Bearer $apiToken",
+//         "Accept": "application/json",
+//       },
+//     );
+//     if (response.statusCode == 200) {
+//       final List<dynamic> data = json.decode(response.body);
+//       setState(() {
+//         cities = data.map((item) => item['city_name'].toString()).toList();
+//       });
+//     } else {
+//       throw Exception('Failed to load cities');
+//     }
+//   }
 
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> data = json.decode(response.body);
-      apiToken = data['auth_token'].toString();
-    } else {
-      throw Exception('Failed to get access token');
-    }
-  }
-
-  // Function to fetch countries from API using the obtained token
   Future<void> fetchCountries() async {
-    await getAccessToken();
+    try {
+      var response = await _dio.get(
+        "${Constant.BASE_URL_2}${Constant.FETCH_COUNTRY}",
+      );
+      if (response.statusCode == 200) {
+        countryJson = response.toString();
+        final List<dynamic> data = response.data['country'];
+        Set<String> uniqueCountries = data.map((e) => e['name'].toString()).toSet();
 
-    final response = await http.get(
-      Uri.parse("https://www.universal-tutorial.com/api/countries/"),
-      headers: {
-        "Authorization": "Bearer $apiToken",
-        "Accept": "application/json",
-      },
-    );
-
-    if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body);
-
-      // Convert the list to a set to remove duplicates and then back to a list
-      final uniqueCountriesSet =
-      data.map((item) => item['country_name'].toString()).toSet();
-      setState(() {
-        countries = uniqueCountriesSet.toList();
-      });
-      print(countries);
-    } else {
-      throw Exception('Failed to load countries');
+        setState(() {
+          countries = uniqueCountries.toList();
+        });
+      } else {
+        throw Exception('Failed to load countries');
+      }
+    } catch (e) {
+      print('Error fetching countries: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error fetching countries: $e')),
+      );
     }
   }
-
   // Function to fetch states from API based on the selected country
   Future<void> fetchStates(String country) async {
-    final response = await http.get(
-      Uri.parse("https://www.universal-tutorial.com/api/states/$country"),
-      headers: {
-        "Authorization": "Bearer $apiToken",
-        "Accept": "application/json",
-      },
+    print(Utils.getIdBySubName(countryJson, country));
+
+    var response = await _dio.get(
+      "${Constant.BASE_URL_2}${Constant.FETCH_STATES}/${Utils.getIdBySubName(countryJson, country)}",
     );
+
     if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body);
+      statesJson = response.toString();
+      final List<dynamic> data = response.data['state'];
+      Set<String> uniqueStates = data.map((e) => e['name'].toString()).toSet();
       setState(() {
-        states = data.map((item) => item['state_name'].toString()).toList();
+        states = uniqueStates.toList();
       });
-      print(states);
     } else {
       throw Exception('Failed to load states');
     }
   }
 
-  // Function to fetch cities from API based on the selected state
   Future<void> fetchCities(String state) async {
+    print("chut786");
 
-    final response = await http.get(
-      Uri.parse("https://www.universal-tutorial.com/api/cities/$state"),
-      headers: {
-        "Authorization": "Bearer $apiToken",
-        "Accept": "application/json",
-      },
-    );
-    if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body);
-      setState(() {
-        cities = data.map((item) => item['city_name'].toString()).toList();
-      });
-    } else {
-      throw Exception('Failed to load cities');
+    print(statesJson);
+    print(state);
+    print("land786");
+
+    print(Utils.getIdBySubNameState(statesJson, state));
+    try {
+      var response = await _dio.get(
+        "${Constant.BASE_URL_2}${Constant.FETCH_CITY}/${Utils.getIdBySubNameState(statesJson, state)}",
+      );
+
+      if (response.statusCode == 200) {
+        cityJson = response.toString();
+        final List<dynamic> data = response.data['city'];
+        Set<String> uniqueCities = data.map((e) => e['name'].toString()).toSet();
+
+        setState(() {
+          cities = uniqueCities.toList();
+        });
+      } else {
+        throw Exception('Failed to load city');
+      }
+    } catch (e) {
+      print('Error fetching citidfdfdes: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error fetching cities: $e')),
+      );
     }
   }
-
   @override
   void initState() {
     super.initState();
@@ -338,12 +418,9 @@ class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
                             fetchStates(selectedCountry);
                           });
                         },
-                        items: countries
-                            .map((country) => DropdownMenuItem<String>(
+                        items: countries.map((country) => DropdownMenuItem<String>(
                           value: country,
-                          child: Text(country),
-                        ))
-                            .toList(),
+                          child: Text(country),)).toList(),
                         decoration: InputDecoration(
                           labelText: 'Select Country',
                           filled: true,

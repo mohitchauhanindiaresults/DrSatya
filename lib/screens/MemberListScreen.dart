@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
+import '../utils/ApiInterceptor.dart';
 import '../utils/Constant.dart';
 import '../utils/Utils.dart';
 import 'AddEnquiryScreen.dart';
@@ -17,6 +18,7 @@ class _MemberListScreenState extends State<MemberListScreen> {
   List<Map<String, dynamic>> filteredMemberList = [];
   bool isLoading = true;
   String error = '';
+  final Dio _dio = ApiInterceptor.createDio(); // Use ApiInterceptor to create Dio instance
 
   @override
   void initState() {
@@ -27,7 +29,7 @@ class _MemberListScreenState extends State<MemberListScreen> {
   Future<void> fetchMemberList() async {
     try {
       final Dio dio = Dio();
-      final response = await dio.get(
+      final response = await _dio.get(
         "https://clients.charumindworks.com/satya/api/enquiry",
       );
 
@@ -82,7 +84,7 @@ class _MemberListScreenState extends State<MemberListScreen> {
                   ),
                 );
               },
-              child: Text('Add Enquiry'),
+              child: Text('Add New'),
             ),
           ),
         ],
@@ -128,7 +130,7 @@ class _MemberListScreenState extends State<MemberListScreen> {
                             MaterialPageRoute(
                               builder: (context) =>
                                   UpdateEnquiryScreen(
-                                    employeeId: member['id'],
+                                    employeeId:17422127,
                                   ),
                             ),
                           );
