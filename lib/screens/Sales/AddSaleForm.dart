@@ -202,7 +202,7 @@ class _AddSaleFormState extends State<AddSaleForm> {
                         controller: centerController,
                         enabled: false,
                         decoration: InputDecoration(
-                          labelText: 'Center',
+                          labelText:'Id No',
                           filled: true,
                           fillColor: Colors.white,
                           contentPadding: EdgeInsets.symmetric(
@@ -355,21 +355,21 @@ class _AddSaleFormState extends State<AddSaleForm> {
                         ),
                       ),
                       SizedBox(height: 15.0),
-                      TextFormField(
-                        controller: Expected_sale,
-                        keyboardType: TextInputType.phone,
-                        decoration: InputDecoration(
-                          labelText: 'Expected Sale',
-                          filled: true,
-                          fillColor: Colors.white,
-                          contentPadding: EdgeInsets.symmetric(
-                              vertical: 13.0, horizontal: 10.0),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 15.0),
+                      // TextFormField(
+                      //   controller: Expected_sale,
+                      //   keyboardType: TextInputType.phone,
+                      //   decoration: InputDecoration(
+                      //     labelText: 'Expected Sale',
+                      //     filled: true,
+                      //     fillColor: Colors.white,
+                      //     contentPadding: EdgeInsets.symmetric(
+                      //         vertical: 13.0, horizontal: 10.0),
+                      //     border: OutlineInputBorder(
+                      //       borderRadius: BorderRadius.circular(10.0),
+                      //     ),
+                      //   ),
+                      // ),
+                      // SizedBox(height: 15.0),
                       DropdownButtonFormField<String>(
                         value: Potentiality.text.isNotEmpty
                             ? Potentiality.text
@@ -516,49 +516,49 @@ class _AddSaleFormState extends State<AddSaleForm> {
                         ),
                       ),
                       SizedBox(height: 15.0),
-                      DropdownButtonFormField<String>(
-                        value: action.text.isNotEmpty ? action.text : null,
-                        onChanged: (String? value) {
-                          setState(() {
-                            action.text = value!;
-                          });
-                        },
-                        items: [
-                          'Billing',
-                          'Follow-up',
-                          'Not-interested',
-                        ].map((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value),
-                          );
-                        }).toList(),
-                        decoration: InputDecoration(
-                          labelText: 'Select Action',
-                          filled: true,
-                          fillColor: Colors.white,
-                          contentPadding: EdgeInsets.symmetric(
-                              vertical: 13.0, horizontal: 10.0),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 15.0),
-                      TextFormField(
-                        controller: final_remark,
-                        keyboardType: TextInputType.text,
-                        decoration: InputDecoration(
-                          labelText: 'Final Remark',
-                          filled: true,
-                          fillColor: Colors.white,
-                          contentPadding: EdgeInsets.symmetric(
-                              vertical: 13.0, horizontal: 10.0),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                        ),
-                      ),
+                      // DropdownButtonFormField<String>(
+                      //   value: action.text.isNotEmpty ? action.text : null,
+                      //   onChanged: (String? value) {
+                      //     setState(() {
+                      //       action.text = value!;
+                      //     });
+                      //   },
+                      //   items: [
+                      //     'Billing',
+                      //     'Follow-up',
+                      //     'Not-interested',
+                      //   ].map((String value) {
+                      //     return DropdownMenuItem<String>(
+                      //       value: value,
+                      //       child: Text(value),
+                      //     );
+                      //   }).toList(),
+                      //   decoration: InputDecoration(
+                      //     labelText: 'Select Action',
+                      //     filled: true,
+                      //     fillColor: Colors.white,
+                      //     contentPadding: EdgeInsets.symmetric(
+                      //         vertical: 13.0, horizontal: 10.0),
+                      //     border: OutlineInputBorder(
+                      //       borderRadius: BorderRadius.circular(10.0),
+                      //     ),
+                      //   ),
+                      // ),
+                      // SizedBox(height: 15.0),
+                      // TextFormField(
+                      //   controller: final_remark,
+                      //   keyboardType: TextInputType.text,
+                      //   decoration: InputDecoration(
+                      //     labelText: 'Final Remark',
+                      //     filled: true,
+                      //     fillColor: Colors.white,
+                      //     contentPadding: EdgeInsets.symmetric(
+                      //         vertical: 13.0, horizontal: 10.0),
+                      //     border: OutlineInputBorder(
+                      //       borderRadius: BorderRadius.circular(10.0),
+                      //     ),
+                      //   ),
+                      // ),
                     ],
                   ),
                 ),
@@ -597,7 +597,7 @@ class _AddSaleFormState extends State<AddSaleForm> {
                         EdgeInsets.symmetric(vertical: 10.0, horizontal: 40.0),
                   ),
                   child: Text(
-                    'Submit Sale Form',
+                    'Create Lead',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,

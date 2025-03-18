@@ -43,6 +43,9 @@ class _MemberListScreenState extends State<MemberListScreen> {
           memberList = List<Map<String, dynamic>>.from(data);
           filteredMemberList = List.from(memberList); // Initialize filtered list
           isLoading = false;
+
+          print("sdsss"+memberList.toString());
+          print("sdsss"+filteredMemberList.toString());
         });
       } else {
         setState(() {
@@ -108,6 +111,8 @@ class _MemberListScreenState extends State<MemberListScreen> {
             child: RefreshIndicator(
               onRefresh: () async {
                 await fetchMemberList();
+
+                print("dfsfdsfds"+searchController.text.toString());
               },
               child: isLoading
                   ? Center(child: CircularProgressIndicator())
@@ -125,12 +130,14 @@ class _MemberListScreenState extends State<MemberListScreen> {
                       elevation: 5,
                       child: ListTile(
                         onTap: () {
+                          print("sdsddfdsd"+member['id'].toString());
+
                           Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) =>
                                   UpdateEnquiryScreen(
-                                    employeeId:17422127,
+                                    employeeId: member['id'],
                                   ),
                             ),
                           );
@@ -145,7 +152,7 @@ class _MemberListScreenState extends State<MemberListScreen> {
                           crossAxisAlignment:
                           CrossAxisAlignment.start,
                           children: [
-                            Text('Age Group: ${member['age_group']}'),
+                            Text('Center Id: ${member['center_id']}'),
                             Text('Mobile: ${member['mobile']}'),
                           ],
                         ),
@@ -161,14 +168,24 @@ class _MemberListScreenState extends State<MemberListScreen> {
     );
   }
 
+  // void filterMemberList(String query) {
+  //   setState(() {
+  //     filteredMemberList = memberList.where((member) =>
+  //     member['mobile'].toString().contains(query) ||
+  //         (member['alternative'] != null &&
+  //             member['alternative'].toString().contains(query)))
+  //         .toList();
+  //   });
+  // }
+
   void filterMemberList(String query) {
     setState(() {
-      filteredMemberList = memberList
-          .where((member) =>
+      filteredMemberList = memberList.where((member) =>
       member['mobile'].toString().contains(query) ||
-          (member['alternative'] != null &&
-              member['alternative'].toString().contains(query)))
-          .toList();
+          (member['alternative'] != null && member['alternative'].toString().contains(query)) ||
+          (member['first_name'] != null && member['first_name'].toString().toLowerCase().contains(query.toLowerCase()))
+      ).toList();
     });
   }
+
 }

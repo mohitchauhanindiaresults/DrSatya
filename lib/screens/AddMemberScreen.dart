@@ -237,6 +237,10 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
       role="8";
       designation="7,21";
 
+    }else if(roleController.text=="Coordinator"){
+      role="9";
+      designation="2,3,4,5,19,21";
+
     }
     String message = "";
 

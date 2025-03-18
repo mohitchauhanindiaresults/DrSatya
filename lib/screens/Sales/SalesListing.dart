@@ -50,7 +50,7 @@ class _SalesListingState extends State<SalesListing> {
         Row(
         children: [
         Text(
-        '         Status       ',
+        ' Status',
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,

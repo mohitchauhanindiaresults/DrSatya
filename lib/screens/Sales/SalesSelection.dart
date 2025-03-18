@@ -63,7 +63,7 @@ import 'package:satya_new/screens/Sales/SalesListing.dart';
         appBar: AppBar(
           backgroundColor: Color(0xFF14B3B4),
           title: Text(
-            'Choose Master Data From List',
+            'Craete Lead',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
@@ -156,7 +156,7 @@ import 'package:satya_new/screens/Sales/SalesListing.dart';
                             crossAxisAlignment:
                             CrossAxisAlignment.start,
                             children: [
-                              Text('Age Group: ${member['age_group']}'),
+                              Text('Center id: ${member['center_id']}'),
                               Text('Mobile: ${member['mobile']}'),
                             ],
                           ),
@@ -177,8 +177,8 @@ import 'package:satya_new/screens/Sales/SalesListing.dart';
         filteredMemberList = memberList
             .where((member) =>
         member['mobile'].toString().contains(query) ||
-            (member['alternative'] != null &&
-                member['alternative'].toString().contains(query)))
+            (member['alternative'] != null && member['alternative'].toString().contains(query)) ||
+            (member['first_name'] != null && member['first_name'].toString().toLowerCase().contains(query.toLowerCase())))
             .toList();
       });
     }
