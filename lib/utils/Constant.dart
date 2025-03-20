@@ -16,6 +16,8 @@ class Constant {
   static const String FETCH_COUNTRY = 'fetch-country';
   static const String FETCH_STATES = 'fetch-state';
   static const String FETCH_CITY = 'fetch-city';
+  static const String FETCH_SUBPROGRAM = 'subProgramFetchList';
+
 
 
 }

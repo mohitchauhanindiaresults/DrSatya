@@ -6,10 +6,9 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:satya_new/screens/Sales/AddSaleForm.dart';
 import 'package:satya_new/screens/SubProgramScreen.dart';
 import 'package:sn_progress_dialog/progress_dialog.dart';
+import '../../utils/ApiInterceptor.dart';
 import '../../utils/Constant.dart';
 import '../../utils/Utils.dart';
-import '../AddEnquiryScreen.dart';
-import '../UpdateEnquiryScreen.dart';
 
 class SalesSetting extends StatefulWidget {
   @override
@@ -26,19 +25,25 @@ class _SalesSettingState extends State<SalesSetting> {
   bool isLoading = true;
   bool isLoadingp = true;
   String error = '';
+  String programString = '';
+  String jsonResponseeee = "";
+  String apiResponse = "";
+  List<String> subprogramList = [];
+  final Dio _dio = ApiInterceptor.createDio(); // Use ApiInterceptor to create Dio instance
 
   @override
   void initState() {
     super.initState();
     fetchMemberList(); // Call the method to fetch the member list
     fetchProgramList();
+    fetchSubProgramList();
   }
 
   // Method to fetch member list from API
   Future<void> fetchMemberList() async {
     try {
       // Replace 'YOUR_API_ENDPOINT' with the actual API endpoint
-      Response response = await Dio().get('https://clients.charumindworks.com/satya/api/cordinatorAddList');
+      Response response = await _dio.get('https://clients.charumindworks.com/satya/api/cordinatorAddList');
       Map<String, dynamic> responseData = response.data;
       print( response.data);
 
@@ -77,19 +82,20 @@ class _SalesSettingState extends State<SalesSetting> {
   Future<void> fetchProgramList() async {
     try {
       // Replace 'YOUR_API_ENDPOINT' with the actual API endpoint
-      Response response = await Dio().get('https://clients.charumindworks.com/satya/api/programSubprogramAddList');
+      Response response = await _dio.get('https://clients.charumindworks.com/satya/api/programSubprogramAddList');
       Map<String, dynamic> responseData = response.data;
-      print(response.data);
+      // print(response.data);
 
       if (responseData['status'] == 'false') {
         List<dynamic> coordinatorList = responseData['programList'];
-        print("bfggrfhgbf" + coordinatorList.toString());
+        // print("bfggrfhgbf" + coordinatorList.toString());
         setState(() {
           // Filter and retrieve only yoga programs with a null parent ID
           programList = List<Map<String, dynamic>>.from(coordinatorList.where((element) => element['parent_id'] == null ));
           filteredProgramList = programList;
           isLoadingp = false;
-
+          print("uuyiyu"+programList.toString());
+          print("uuyidfdffyu"+filteredProgramList.toString());
           // Extracting names and adding them to a separate list
           List<String> names = [];
           for (var coordinator in coordinatorList) {
@@ -115,7 +121,26 @@ class _SalesSettingState extends State<SalesSetting> {
     }
   }
 
-
+  Future<void> fetchSubProgramList() async {
+    try {
+      final response = await _dio.get(
+        Constant.BASE_URL_2+Constant.FETCH_SUBPROGRAM,
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',  // Add necessary headers
+            'Accept': 'application/json',
+          },
+        ),
+      );
+      if (response.statusCode == 200) {
+        print('Success: ${response.data}');
+      } else {
+        print('Failed with status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -132,182 +157,289 @@ class _SalesSettingState extends State<SalesSetting> {
           ),
         ),
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(height: 15.0),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 15.0),
 
-          Center(
-            child: Text(
-              'Coordinator names',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 1,
-                color: Colors.black,
+            // Coordinator Section
+            Center(
+              child: Text(
+                'Coordinator names',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1,
+                  color: Colors.black,
+                ),
               ),
             ),
-          ),
 
-          // Add a search bar
-          Padding(
-            padding: const EdgeInsets.all(15.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: coordinatorController,
-                    decoration: InputDecoration(
-                      hintText: 'Fill Coordinator',
+            Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: coordinatorController,
+                      decoration: InputDecoration(
+                        hintText: 'Fill Coordinator',
+                      ),
+                      onChanged: (query) {
+                        filterMemberList(query);
+                      },
                     ),
-                    onChanged: (query) {
-                      filterMemberList(query);
-                    },
                   ),
-                ),
-                SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: () {
-                    // Add your API call logic here
-                    // For example, you can call a method like hitApi();
-                    if(coordinatorController.text.isEmpty){
-                      Utils.showAlertDialog(context, "Text box cannot be empty");
-                    }else{
-                      AddApi(context,coordinatorController.text);
-                    }
-                  },
-                  child: Text('Add'),
-                ),
-              ],
-            ),
-          ),
-
-          // Display the member list
-          isLoadingp
-              ? CircularProgressIndicator()
-              : error.isNotEmpty
-              ? Text(error)
-              : Expanded(
-            child: ListView.builder(
-              itemCount: filteredMemberList.length,
-              itemBuilder: (context, index) {
-                final member = filteredMemberList[index];
-                return ListTile(
-                  title: Text(
-                    ' ${member['name']}',
-                  ),
-                  subtitle: member['alternative'] != null
-                      ? Text(
-                      'Alternative: ${member['alternative']}')
-                      : null,
-                  trailing: IconButton(
-                    icon: Icon(Icons.delete, color: Colors.red),
+                  SizedBox(width: 10),
+                  ElevatedButton(
                     onPressed: () {
-                      print(member['name']);
-                      deleteApi(context, member['name']);
+                      if (coordinatorController.text.isEmpty) {
+                        Utils.showAlertDialog(context, "Text box cannot be empty");
+                      } else {
+                        AddApi(context, coordinatorController.text);
+                      }
                     },
+                    child: Text('Add'),
                   ),
-                );
-              },
-            ),
-          ),
-
-
-          SizedBox(height: 15.0),
-
-          Center(
-            child: Text(
-              'Programs',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 1,
-                color: Colors.black,
+                ],
               ),
             ),
-          ),
 
-          // Add a search bar
-          Padding(
-            padding: const EdgeInsets.all(15.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: coordinatorControllerp,
-                    decoration: InputDecoration(
-                      hintText: 'Fill Program',
+            isLoadingp
+                ? Center(child: CircularProgressIndicator())
+                : error.isNotEmpty
+                ? Center(child: Text(error))
+                : SizedBox(
+              height: 200,  // Set a fixed height for the ListView
+              child: ListView.builder(
+                itemCount: filteredMemberList.length,
+                itemBuilder: (context, index) {
+                  final member = filteredMemberList[index];
+                  return ListTile(
+                    title: Text(' ${member['name']}'),
+                    subtitle: member['alternative'] != null
+                        ? Text('Alternative: ${member['alternative']}')
+                        : null,
+                    trailing: IconButton(
+                      icon: Icon(Icons.delete, color: Colors.red),
+                      onPressed: () {
+                        print(member['name']);
+                        deleteApi(context, member['name']);
+                      },
                     ),
-                    onChanged: (query) {
-                      filterMemberListp(query);
-                    },
-                  ),
-                ),
-                SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: () {
-                    // Add your API call logic here
-                    // For example, you can call a method like hitApi();
-                    if(coordinatorControllerp.text.isEmpty){
-                      Utils.showAlertDialog(context, "Text box cannot be empty");
-                    }else{
-                      AddApiProgram(context,coordinatorControllerp.text);
-                    }
-                  },
-                  child: Text('Add'),
-                ),
-              ],
+                  );
+                },
+              ),
             ),
-          ),
 
-          // Display the member list
-          // Display the program list
-          isLoadingp
-              ? CircularProgressIndicator()
-              : error.isNotEmpty
-              ? Text(error)
-              : Expanded(
-            child: ListView.builder(
-              itemCount: filteredProgramList.length,
-              itemBuilder: (context, index) {
-                final program = filteredProgramList[index];
-                return ListTile(
-                  title: GestureDetector(
-                    onTap: () {
-                      // Perform action when name is clicked
-                      print("Clicked on: ${program['name']}");
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              SubProgramScreen(
-                                employeeId: program['id'],
-                              ),
-                        ),
-                      );
+            SizedBox(height: 15.0),
 
-                      // You can perform any action here
-                    },
-                    child: Text(
-                      ' ${program['name']}',
+            // Programs Section
+            Center(
+              child: Text(
+                'Programs',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: coordinatorControllerp,
+                      decoration: InputDecoration(
+                        hintText: 'Fill Program',
+                      ),
+                      onChanged: (query) {
+                        filterMemberListp(query);
+                      },
                     ),
                   ),
-                  subtitle: program['alternative'] != null
-                      ? Text('Alternative: ${program['alternative']}')
-                      : null,
-                  trailing: IconButton(
-                    icon: Icon(Icons.delete, color: Colors.red),
+                  SizedBox(width: 10),
+                  ElevatedButton(
                     onPressed: () {
-                      print(program['name']);
-                      deleteApiProgram(context, program['name']);
+                      if (coordinatorControllerp.text.isEmpty) {
+                        Utils.showAlertDialog(context, "Text box cannot be empty");
+                      } else {
+                        AddApiProgram(context, coordinatorControllerp.text);
+                      }
                     },
+                    child: Text('Add'),
                   ),
-                );
-              },
+                ],
+              ),
             ),
-          ),
 
-        ],
+            isLoadingp
+                ? Center(child: CircularProgressIndicator())
+                : error.isNotEmpty
+                ? Center(child: Text(error))
+                : SizedBox(
+              height: 200,  // Set a fixed height for the ListView
+              child: ListView.builder(
+                itemCount: filteredProgramList.length,
+                itemBuilder: (context, index) {
+                  final program = filteredProgramList[index];
+                  return ListTile(
+                    title: GestureDetector(
+                      onTap: () {
+                        print("Clicked on: ${program['name']}");
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SubProgramScreen(
+                              employeeId: program['id'],
+                            ),
+                          ),
+                        );
+                      },
+                      child: Text(' ${program['name']}'),
+                    ),
+                    subtitle: program['alternative'] != null
+                        ? Text('Alternative: ${program['alternative']}')
+                        : null,
+                    trailing: IconButton(
+                      icon: Icon(Icons.delete, color: Colors.red),
+                      onPressed: () {
+                        print(program['name']);
+                        deleteApiProgram(context, program['name']);
+                      },
+                    ),
+                  );
+                },
+              ),
+            ),
+
+            SizedBox(height: 15.0),
+
+            // Sub Program Section
+            Center(
+              child: Text(
+                'Sub Program',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+            SizedBox(height: 15.0),
+            DropdownButtonFormField<String>(
+              padding: const EdgeInsets.only(
+                left: 15.0,
+                right: 15.0,
+              ),
+              value: programString.isNotEmpty &&
+                  programList.any((item) => item['name'] == programString)
+                  ? programString
+                  : null,
+              onChanged: (String? value) {
+                setState(() {
+                  programString = value ?? '';
+                  subprogramList = getNamesWithParentId(
+                      apiResponse,
+                      getIdFromName(apiResponse, programString)
+                  );
+                });
+              },
+              items: programList.map((item) => DropdownMenuItem<String>(
+                value: item['name'].toString(),
+                child: Text(item['name'].toString()),
+              )).toList(),
+              decoration: InputDecoration(
+                labelText: 'Select Program',
+                filled: true,
+                // fillColor: Colors.white,
+                contentPadding: EdgeInsets.symmetric(vertical: 13.0, horizontal: 10.0),
+                // border: OutlineInputBorder(
+                //   borderRadius: BorderRadius.circular(10.0),
+                // ),
+              ),
+            ),
+            // SizedBox(height: 15.0),
+
+
+            Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: coordinatorControllerp,
+                      decoration: InputDecoration(
+                        hintText: 'Fill Sub Program',
+                      ),
+                      onChanged: (query) {
+                        filterMemberListp(query);
+                      },
+                    ),
+                  ),
+                  SizedBox(width: 10),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (coordinatorControllerp.text.isEmpty) {
+                        Utils.showAlertDialog(context, "Text box cannot be empty");
+                      } else {
+                        AddApiProgram(context, coordinatorControllerp.text);
+                      }
+                    },
+                    child: Text('Add'),
+                  ),
+                ],
+              ),
+            ),
+
+            isLoadingp
+                ? Center(child: CircularProgressIndicator())
+                : error.isNotEmpty
+                ? Center(child: Text(error))
+                : SizedBox(
+              height: 200,  // Set a fixed height for the ListView
+              child: ListView.builder(
+                itemCount: filteredProgramList.length,
+                itemBuilder: (context, index) {
+                  final program = filteredProgramList[index];
+                  return ListTile(
+                    title: GestureDetector(
+                      onTap: () {
+                        print("Clicked on: ${program['name']}");
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SubProgramScreen(
+                              employeeId: program['id'],
+                            ),
+                          ),
+                        );
+                      },
+                      child: Text(' ${program['name']}'),
+                    ),
+                    subtitle: program['alternative'] != null
+                        ? Text('Alternative: ${program['alternative']}')
+                        : null,
+                    trailing: IconButton(
+                      icon: Icon(Icons.delete, color: Colors.red),
+                      onPressed: () {
+                        print(program['name']);
+                        deleteApiProgram(context, program['name']);
+                      },
+                    ),
+                  );
+                },
+              ),
+            ),
+
+            SizedBox(height: 15.0),
+          ],
+        ),
       ),
     );
   }
@@ -474,16 +606,13 @@ class _SalesSettingState extends State<SalesSetting> {
     ProgressDialog pd = ProgressDialog(context: context);
     pd.show(msg: "Please Wait");
     String message = "";
-    final Dio dio = Dio();
-    // Adjust the API endpoint accordingly
     final data = {
       "name": name,
       "login_id": (await Utils.getStringFromPrefs(Constant.ROLL_ID)),
     };
     print(data);
     try {
-      final response =
-      await dio.post(Constant.BASE_URL + "api/cordinatorAddList", data: data);
+      final response = await _dio.post(Constant.BASE_URL + "api/cordinatorAddList", data: data);
 
       if (response.statusCode == 200) {
         pd.close(delay: 0);
@@ -542,16 +671,13 @@ class _SalesSettingState extends State<SalesSetting> {
     ProgressDialog pd = ProgressDialog(context: context);
     pd.show(msg: "Please Wait");
     String message = "";
-    final Dio dio = Dio();
-    // Adjust the API endpoint accordingly
     final data = {
       "name": name,
       "login_id": (await Utils.getStringFromPrefs(Constant.ROLL_ID)),
     };
     print(data);
     try {
-      final response =
-      await dio.post(Constant.BASE_URL + "api/programSubprogramAddList", data: data);
+      final response = await _dio.post(Constant.BASE_URL + "api/programSubprogramAddList", data: data);
 
       if (response.statusCode == 200) {
         pd.close(delay: 0);
@@ -605,5 +731,30 @@ class _SalesSettingState extends State<SalesSetting> {
       Utils.showAlertDialog(context, 'SOMETHING WENT WRONG !!');
       throw Exception('An error occurred during enquiry');
     }
+  }
+
+  List<String> getNamesWithParentId(String responseString, int parentId) {
+    List<Map<String, dynamic>> response = (json.decode(responseString)['programList'] as List)
+        .map((item) => item as Map<String, dynamic>)
+        .toList();
+    List<String> names = [];
+    for (var item in response) {
+      if (item['parent_id'] == parentId) {
+        names.add(item['name']);
+      }
+    }
+    return names;
+  }
+
+  int getIdFromName(String responseString, String name) {
+    List<Map<String, dynamic>> response = (json.decode(responseString)['programList'] as List)
+        .map((item) => item as Map<String, dynamic>)
+        .toList();
+    for (var item in response) {
+      if (item['name'] == name) {
+        return item['id'];
+      }
+    }
+    return 0; // Return null if the name is not found
   }
 }

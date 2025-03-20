@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:satya_new/screens/Sales/SalesFollowup.dart';
 import 'package:sn_progress_dialog/progress_dialog.dart';
+import '../../utils/ApiInterceptor.dart';
 import '../../utils/Constant.dart';
 import '../../utils/Utils.dart';
 import '../DashboardScreen.dart';
@@ -54,6 +55,7 @@ class _AddSaleFormState extends State<AddSaleForm> {
   List<String> subprogramList = [];
   List<String> states = [];
   List<String> cities = [];
+  final Dio _dio = ApiInterceptor.createDio(); // Use ApiInterceptor to create Dio instance
   @override
   void initState() {
     super.initState();
@@ -202,7 +204,7 @@ class _AddSaleFormState extends State<AddSaleForm> {
                         controller: centerController,
                         enabled: false,
                         decoration: InputDecoration(
-                          labelText:'Id No',
+                          labelText:'Center',
                           filled: true,
                           fillColor: Colors.white,
                           contentPadding: EdgeInsets.symmetric(
@@ -290,9 +292,7 @@ class _AddSaleFormState extends State<AddSaleForm> {
                             print("gbghbihfjvuhhuhgvbduhsi");
                           });
                         },
-                        items: programList
-                            .map((country) => DropdownMenuItem<String>(
-                          value: country,
+                        items: programList.map((country) => DropdownMenuItem<String>(value: country,
                           child: Text(country),
                         ))
                             .toList(),
@@ -570,16 +570,13 @@ class _AddSaleFormState extends State<AddSaleForm> {
                         lastNameController.text.isEmpty ||
                         mobileController.text.isEmpty) {
                       // Show an error message or handle the validation failure as needed.
-                      Utils.showAlertDialog(
-                          context, "Please fill in all fields");
+                      Utils.showAlertDialog(context, "Please fill in all fields");
                     } else if (mobileController.text.length != 10) {
                       Utils.showAlertDialog(context, "Enter correct mobile !!");
                     } else if (alternativeMobileController.text.length != 10) {
                       Utils.showAlertDialog(context, "Enter correct mobile !!");
-                    } else if (mobileController.text ==
-                        alternativeMobileController.text) {
-                      Utils.showAlertDialog(
-                          context, "Numbers cannot be same !!");
+                    } else if (mobileController.text == alternativeMobileController.text) {
+                      Utils.showAlertDialog(context, "Numbers cannot be same !!");
                     } else {
                       // All controllers have non-empty text, proceed with addEnquiry.
 
@@ -681,21 +678,22 @@ class _AddSaleFormState extends State<AddSaleForm> {
       "name": firstNameController.text,
       "mobile": mobileController.text,
       "alternative": alternativeMobileController.text,
+      "center_id":  Utils.generateTimestampInMilliseconds(),
       "center": centerController.text,
-      "unique_id": centerController.text,
+      // "unique_id": Utils.generateTimestampInMilliseconds(),
       "program": programString,
       "sub-program": subprogramString,
       "intial_remark": intial_remark.text,
-      "total_sale": Expected_sale.text,
+      "total_sale":"static",
       "potentiality": Potentiality.text,
       "source": Source.text,
       "assigned_to": Assigned_too,
       "status": Status.text,
       "cordinator": selectedCoordinator,
-      "final_remark": final_remark.text,
-      "date": getCurrentDate(),
-      "time": getCurrentTime(),
-      "remark": final_remark.text,
+      // "final_remark": final_remark.text,
+      // "date": getCurrentDate(),
+      // "time": getCurrentTime(),
+      // "remark": final_remark.text,
       "login_id": (await Utils.getStringFromPrefs(Constant.ROLL_ID)),
       "reports": action.text,
       "alerts": "0",
@@ -703,8 +701,7 @@ class _AddSaleFormState extends State<AddSaleForm> {
     };
     print(data);
     try {
-      final response =
-          await dio.post(Constant.BASE_URL + "api/addesales", data: data);
+      final response = await _dio.post(Constant.BASE_URL + "api/addesales", data: data);
 
       if (response.statusCode == 200) {
         pd.close(delay: 0);
@@ -720,12 +717,7 @@ class _AddSaleFormState extends State<AddSaleForm> {
         String status = responseMap['status'].toString();
 
         if (status == "success") {
-          Fluttertoast.showToast(
-              msg: message,
-              toastLength: Toast.LENGTH_SHORT,
-              gravity: ToastGravity.BOTTOM,
-              backgroundColor: Colors.grey,
-              textColor: Colors.white);
+          Fluttertoast.showToast(msg: message, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, backgroundColor: Colors.grey, textColor: Colors.white);
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -735,14 +727,7 @@ class _AddSaleFormState extends State<AddSaleForm> {
         } else {
           pd.close(delay: 0);
           Utils.showAlertDialog(context, "SOMETHING WENT WRONG !!");
-
-          Fluttertoast.showToast(
-            msg: message,
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            backgroundColor: Colors.grey,
-            textColor: Colors.white,
-          );
+          Fluttertoast.showToast(msg: message, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, backgroundColor: Colors.grey, textColor: Colors.white,);
         }
       } else {
         pd.close(delay: 0);

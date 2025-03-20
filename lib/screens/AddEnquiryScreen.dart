@@ -41,15 +41,21 @@ class _AddEnquiryScreenState extends State<AddEnquiryScreen> {
   List<String> countries = [];
   List<String> states = [];
   List<String> cities = [];
+  List<String> coordinators = [];
+  List<Map<String, dynamic>> memberList = [];
+  List<Map<String, dynamic>> filteredMemberList = [];
 
   String selectedCountry = '';
   String countryJson = '';
   String statesJson = '';
   String cityJson = '';
+  String selectedCoordinator = '';
   String selectedState = '';
   String selectedCity = '';
   String apiToken = ""; // Variable to store the obtained API token
   String email = "";
+  bool isLoading = true;
+  String error = '';
   String acessToken = ""; // Variable to store the obtained API token
   final Dio _dio = ApiInterceptor.createDio(); // Use ApiInterceptor to create Dio instance
 
@@ -134,18 +140,18 @@ class _AddEnquiryScreenState extends State<AddEnquiryScreen> {
     initiate();
 
   }
+
   Future<void> initiate() async {
 
 
     centerController.text = Utils.generateTimestampInMilliseconds();
-
     acessToken=(await Utils.getStringFromPrefs(Constant.TOKEN)!)!;
     email= (await Utils.getStringFromPrefs(Constant.EMAIL))!;
     print("object"+acessToken);
     print("object"+email);
 
     fetchCountries();
-
+    fetchMemberList();
     // Set initial values for dropdowns
     if (countries.isNotEmpty) {
     selectedCountry = countries.first;
@@ -159,6 +165,45 @@ class _AddEnquiryScreenState extends State<AddEnquiryScreen> {
     selectedCity = cities.first;
     }
   }
+  Future<void> fetchMemberList() async {
+    try {
+      // Replace 'YOUR_API_ENDPOINT' with the actual API endpoint
+      Response response = await Dio().get('https://clients.charumindworks.com/satya/api/cordinatorAddList');
+      Map<String, dynamic> responseData = response.data;
+      print( response.data);
+
+      if (responseData['status'] == 'false') {
+        List<dynamic> coordinatorList = responseData['cordinatorList'];
+        print(coordinatorList);
+        setState(() {
+          memberList = List<Map<String, dynamic>>.from(coordinatorList);
+          // filteredMemberList = memberList;
+          isLoading = false;
+
+          // Extracting names and adding them to a separate list
+          List<String> names = [];
+          for (var coordinator in coordinatorList) {
+            coordinators.add(coordinator['name']);
+          }
+
+          // Now 'names' contains the list of names from 'cordinatorList'
+          print(names);
+        });
+
+      } else {
+        setState(() {
+          error = 'Failed to fetch data. ${responseData['message']}';
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        error = 'Failed to fetch data. Please try again.';
+        isLoading = false;
+      });
+    }
+  }
+
   void submitEnquiry() async {
     print(alternativeMobileController.text);
     print("fgfgf");
@@ -267,6 +312,35 @@ class _AddEnquiryScreenState extends State<AddEnquiryScreen> {
                         ),
                       ),
                       SizedBox(height: 15.0),
+
+                      DropdownButtonFormField<String>(
+                        value: selectCenterController.text.isNotEmpty
+                            ? selectCenterController.text
+                            : null,
+                        onChanged: (String? value) {
+                          setState(() {
+                            selectCenterController.text = value!;
+                          });
+                        },
+                        items: ['Salimar Bag', 'Ashok Vihar','Online'].map((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                        decoration: InputDecoration(
+                          labelText: 'Select Center',
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: EdgeInsets.symmetric(
+                              vertical: 13.0, horizontal: 10.0),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 15.0),
+
                       TextFormField(
                         controller: firstNameController,
                         decoration: InputDecoration(
@@ -636,23 +710,41 @@ class _AddEnquiryScreenState extends State<AddEnquiryScreen> {
                         ),
                       ),
                       SizedBox(height: 15.0),
+                      // TextFormField(
+                      //   controller: coordinatorController,
+                      //   decoration: InputDecoration(
+                      //     labelText: 'Coordinator',
+                      //     filled: true,
+                      //     fillColor: Colors.white,
+                      //     contentPadding: EdgeInsets.symmetric(
+                      //         vertical: 13.0, horizontal: 10.0),
+                      //     border: OutlineInputBorder(
+                      //       borderRadius: BorderRadius.circular(10.0),
+                      //     ),
+                      //   ),
+                      // ),
+                      // SizedBox(height: 15.0),
                       DropdownButtonFormField<String>(
-                        value: selectCenterController.text.isNotEmpty
-                            ? selectCenterController.text
+                        value: selectedCoordinator.isNotEmpty &&
+                            coordinators.contains(selectedCoordinator)
+                            ? selectedCoordinator
                             : null,
                         onChanged: (String? value) {
                           setState(() {
-                            selectCenterController.text = value!;
+                            selectedCoordinator = value ?? '';
+
+
+                            print("gbghbihfjvuhhuhgvbduhsi");
                           });
                         },
-                        items: ['Salimar Bag', 'Ashok Vihar','Online'].map((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value),
-                          );
-                        }).toList(),
+                        items: coordinators
+                            .map((country) => DropdownMenuItem<String>(
+                          value: country,
+                          child: Text(country),
+                        ))
+                            .toList(),
                         decoration: InputDecoration(
-                          labelText: 'Select Center',
+                          labelText: 'Select Coordinator',
                           filled: true,
                           fillColor: Colors.white,
                           contentPadding: EdgeInsets.symmetric(
@@ -663,20 +755,7 @@ class _AddEnquiryScreenState extends State<AddEnquiryScreen> {
                         ),
                       ),
                       SizedBox(height: 15.0),
-                      TextFormField(
-                        controller: coordinatorController,
-                        decoration: InputDecoration(
-                          labelText: 'Coordinator',
-                          filled: true,
-                          fillColor: Colors.white,
-                          contentPadding: EdgeInsets.symmetric(
-                              vertical: 13.0, horizontal: 10.0),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 15.0),
+
                       DropdownButtonFormField<String>(
                         value: sourceController.text.isNotEmpty ? sourceController.text : null,
                         onChanged: (String? value) {
@@ -718,7 +797,7 @@ class _AddEnquiryScreenState extends State<AddEnquiryScreen> {
                     submitEnquiry(); // No need to await a void function
                     print("Enquiry submitted successfully");
                   },
-    style: ElevatedButton.styleFrom(
+                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xFF14B3B4),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0),
@@ -774,7 +853,7 @@ class _AddEnquiryScreenState extends State<AddEnquiryScreen> {
       // "qualification": qualificationController.text,
       // "age_group": ageGroupController.text,
       // "gender": genderController.text,
-      "cordinator": coordinatorController.text,
+      "cordinator": selectedCoordinator,
       "source": sourceController.text,
       "login_id": (await Utils.getStringFromPrefs(Constant.ROLL_ID)),
     };
