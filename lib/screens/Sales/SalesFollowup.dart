@@ -1,10 +1,5 @@
-import 'dart:convert';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-
-import '../../utils/Utils.dart';
-
 class SalesFollowup extends StatefulWidget {
   final int employeeId;
 
@@ -136,8 +131,7 @@ class _SalesFollowupState extends State<SalesFollowup> {
 
   Future<Map<String, dynamic>> initiate(int uniqueId) async {
     // Replace the following URL with your actual API endpoint
-    const apiEndpoint =
-        'https://clients.charumindworks.com/satya/api/salesList';
+    const apiEndpoint = 'https://clients.charumindworks.com/satya/api/salesList';
 
     try {
       // Make API call using Dio

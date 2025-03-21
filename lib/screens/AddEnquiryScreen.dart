@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:sn_progress_dialog/progress_dialog.dart';
 
@@ -142,8 +141,6 @@ class _AddEnquiryScreenState extends State<AddEnquiryScreen> {
   }
 
   Future<void> initiate() async {
-
-
     centerController.text = Utils.generateTimestampInMilliseconds();
     acessToken=(await Utils.getStringFromPrefs(Constant.TOKEN)!)!;
     email= (await Utils.getStringFromPrefs(Constant.EMAIL))!;
@@ -218,7 +215,7 @@ class _AddEnquiryScreenState extends State<AddEnquiryScreen> {
         // qualificationController.text.isEmpty ||
         // ageGroupController.text.isEmpty ||
         // genderController.text.isEmpty ||
-        coordinatorController.text.isEmpty ||
+
         sourceController.text.isEmpty) {
       Utils.showAlertDialog(context, "Please fill in all fields");
       return;

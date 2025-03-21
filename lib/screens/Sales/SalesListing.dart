@@ -2,6 +2,9 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:satya_new/screens/Sales/SalesFollowup.dart';
+
+import '../../utils/ApiInterceptor.dart';
 
 class SalesListing extends StatefulWidget {
   @override
@@ -13,6 +16,7 @@ class _SalesListingState extends State<SalesListing> {
   String selectedStatus = '';
   String selectedPotentiality = '';
   String selectedSource = '';
+  final Dio _dio = ApiInterceptor.createDio(); // Use ApiInterceptor to create Dio instance
 
   @override
   void initState() {
@@ -47,57 +51,52 @@ class _SalesListingState extends State<SalesListing> {
         ),
         child: Column(
           children: [
-        Row(
-        children: [
-        Text(
-        ' Status',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1,
-            color: Colors.white,
-          ),
-        ),
-        Text(
-          'Potentiality     ',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1,
-            color: Colors.white,
-          ),
-        ),
-        Text(
-          'Source',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1,
-            color: Colors.white,
-          ),
-        ),
-        ],
-      ),
+            Row(
+              children: [
+                Text(
+                  ' Status',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1,
+                    color: Colors.white,
+                  ),
+                ),
+                Text(
+                  'Potentiality     ',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1,
+                    color: Colors.white,
+                  ),
+                ),
+                Text(
+                  'Source',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
 
-            Row( // Row to display dropdowns horizontally
+            Row(
               children: [
                 Expanded(
-                  flex: 1, // Use flex property to distribute space equally
+                  flex: 1,
                   child: DropdownButton<String>(
                     value: selectedStatus,
-                    hint: Text('Select a status'), // Add this line for the prompt
+                    hint: Text('Select a status'),
                     onChanged: (String? newValue) {
                       setState(() {
                         selectedStatus = newValue ?? '';
                       });
                     },
-                    items: <String>[
-                      '', // Empty string represents no filtering
-                      'New enquiry',
-                      'Old enquiry',
-                      'Current member',
-                      'Old member',
-                    ].map<DropdownMenuItem<String>>((String value) {
+                    items: <String>['', 'New enquiry', 'Old enquiry', 'Current member', 'Old member']
+                        .map<DropdownMenuItem<String>>((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
                         child: Text(value),
@@ -106,7 +105,7 @@ class _SalesListingState extends State<SalesListing> {
                   ),
                 ),
                 Expanded(
-                  flex: 1, // Use flex property to distribute space equally
+                  flex: 1,
                   child: DropdownButton<String>(
                     value: selectedPotentiality,
                     onChanged: (String? newValue) {
@@ -114,13 +113,8 @@ class _SalesListingState extends State<SalesListing> {
                         selectedPotentiality = newValue ?? '';
                       });
                     },
-                    items: <String>[
-                      '', // Empty string represents no filtering
-                      'Super Hot',
-                      'Hot',
-                      'Warm',
-                      'Cold',
-                    ].map<DropdownMenuItem<String>>((String value) {
+                    items: <String>['', 'Super Hot', 'Hot', 'Warm', 'Cold']
+                        .map<DropdownMenuItem<String>>((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
                         child: Text(value),
@@ -129,7 +123,7 @@ class _SalesListingState extends State<SalesListing> {
                   ),
                 ),
                 Expanded(
-                  flex: 1, // Use flex property to distribute space equally
+                  flex: 1,
                   child: DropdownButton<String>(
                     value: selectedSource,
                     onChanged: (String? newValue) {
@@ -137,12 +131,8 @@ class _SalesListingState extends State<SalesListing> {
                         selectedSource = newValue ?? '';
                       });
                     },
-                    items: <String>[
-                      '', // Empty string represents no filtering
-                      'FaceBook',
-                      'Instagram',
-                      'others',
-                    ].map<DropdownMenuItem<String>>((String value) {
+                    items: <String>['', 'FaceBook', 'Instagram', 'others']
+                        .map<DropdownMenuItem<String>>((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
                         child: Text(value),
@@ -158,31 +148,23 @@ class _SalesListingState extends State<SalesListing> {
                 future: employeeDetails,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(
-                      child: CircularProgressIndicator(),
-                    );
+                    return Center(child: CircularProgressIndicator());
                   } else if (snapshot.hasError) {
-                    return Center(
-                      child: Text('Error loading data'),
-                    );
+                    return Center(child: Text('Error loading data'));
                   } else {
                     List<dynamic> salesList = snapshot.data!['sales'];
 
-                    // Filter salesList based on selectedStatus
+                    // Filtering logic
                     if (selectedStatus.isNotEmpty) {
                       salesList = salesList
                           .where((sale) => sale['status'] == selectedStatus)
                           .toList();
                     }
-
-                    // Filter salesList based on selectedPotentiality
                     if (selectedPotentiality.isNotEmpty) {
                       salesList = salesList
                           .where((sale) => sale['potentiality'] == selectedPotentiality)
                           .toList();
                     }
-
-                    // Filter salesList based on selectedSource
                     if (selectedSource.isNotEmpty) {
                       salesList = salesList
                           .where((sale) => sale['source'] == selectedSource)
@@ -214,13 +196,31 @@ class _SalesListingState extends State<SalesListing> {
                                   _buildText('Status', sale['status']),
                                   _buildText('Coordinator', sale['cordinator']),
                                   _buildText('Final Remark', sale['final_remark']),
+
+                                  // Follow Up Button
+                                  Align(
+                                    alignment: Alignment.centerRight,
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        onFollowUpPressed(sale);
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.orange, // Button color
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                      ),
+                                      child: Text('Follow Up'),
+                                    ),
+                                  ),
                                 ],
                               ),
                               onTap: () {
                                 // Handle item click
+                                print("Tapped on ${sale['name']}");
                               },
                             ),
-                            Divider(), // Add a divider after each ListTile
+                            Divider(),
                           ],
                         );
                       },
@@ -253,13 +253,18 @@ class _SalesListingState extends State<SalesListing> {
     );
   }
 
+  void onFollowUpPressed(Map<String, dynamic> sale) {
+    print('Follow-up clicked for ${sale['name']}');
+    Navigator.push(context, MaterialPageRoute(builder: (context) => SalesFollowup(employeeId: 3,)));
+  }
+
   Future<Map<String, dynamic>> initiate() async {
     // Replace the following URL with your actual API endpoint
     const apiEndpoint = 'https://clients.charumindworks.com/satya/api/salesList';
 
     try {
       // Make API call using Dio
-      final response = await Dio().get(apiEndpoint);
+      final response = await _dio.get(apiEndpoint);
 
       // Filter sales list based on unique_id
       List<dynamic> filteredSales = response.data['sales'].toList();

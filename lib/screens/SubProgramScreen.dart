@@ -99,7 +99,7 @@ class _SubProgramScreenState extends State<SubProgramScreen> {
 
           Center(
             child: Text(
-              'Programs',
+              'SubPrograms',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -118,7 +118,7 @@ class _SubProgramScreenState extends State<SubProgramScreen> {
                   child: TextField(
                     controller: coordinatorControllerp,
                     decoration: InputDecoration(
-                      hintText: 'Fill Program',
+                      hintText: 'Fill SubProgram',
                     ),
                     onChanged: (query) {
                       filterMemberListp(query);

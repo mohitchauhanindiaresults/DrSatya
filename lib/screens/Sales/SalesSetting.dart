@@ -43,7 +43,7 @@ class _SalesSettingState extends State<SalesSetting> {
   Future<void> fetchMemberList() async {
     try {
       // Replace 'YOUR_API_ENDPOINT' with the actual API endpoint
-      Response response = await _dio.get('https://clients.charumindworks.com/satya/api/cordinatorAddList');
+      Response response = await _dio.get('${Constant.BASE_URL_2}cordinatorAddList');
       Map<String, dynamic> responseData = response.data;
       print( response.data);
 
@@ -82,7 +82,7 @@ class _SalesSettingState extends State<SalesSetting> {
   Future<void> fetchProgramList() async {
     try {
       // Replace 'YOUR_API_ENDPOINT' with the actual API endpoint
-      Response response = await _dio.get('https://clients.charumindworks.com/satya/api/programSubprogramAddList');
+      Response response = await _dio.get('${Constant.BASE_URL_2}programSubprogramAddList');
       Map<String, dynamic> responseData = response.data;
       // print(response.data);
 
@@ -320,122 +320,122 @@ class _SalesSettingState extends State<SalesSetting> {
             SizedBox(height: 15.0),
 
             // Sub Program Section
-            Center(
-              child: Text(
-                'Sub Program',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1,
-                  color: Colors.black,
-                ),
-              ),
-            ),
-            SizedBox(height: 15.0),
-            DropdownButtonFormField<String>(
-              padding: const EdgeInsets.only(
-                left: 15.0,
-                right: 15.0,
-              ),
-              value: programString.isNotEmpty &&
-                  programList.any((item) => item['name'] == programString)
-                  ? programString
-                  : null,
-              onChanged: (String? value) {
-                setState(() {
-                  programString = value ?? '';
-                  subprogramList = getNamesWithParentId(
-                      apiResponse,
-                      getIdFromName(apiResponse, programString)
-                  );
-                });
-              },
-              items: programList.map((item) => DropdownMenuItem<String>(
-                value: item['name'].toString(),
-                child: Text(item['name'].toString()),
-              )).toList(),
-              decoration: InputDecoration(
-                labelText: 'Select Program',
-                filled: true,
-                // fillColor: Colors.white,
-                contentPadding: EdgeInsets.symmetric(vertical: 13.0, horizontal: 10.0),
-                // border: OutlineInputBorder(
-                //   borderRadius: BorderRadius.circular(10.0),
-                // ),
-              ),
-            ),
+            // Center(
+            //   child: Text(
+            //     'Sub Program',
+            //     style: TextStyle(
+            //       fontSize: 16,
+            //       fontWeight: FontWeight.bold,
+            //       letterSpacing: 1,
+            //       color: Colors.black,
+            //     ),
+            //   ),
+            // ),
             // SizedBox(height: 15.0),
-
-
-            Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: coordinatorControllerp,
-                      decoration: InputDecoration(
-                        hintText: 'Fill Sub Program',
-                      ),
-                      onChanged: (query) {
-                        filterMemberListp(query);
-                      },
-                    ),
-                  ),
-                  SizedBox(width: 10),
-                  ElevatedButton(
-                    onPressed: () {
-                      if (coordinatorControllerp.text.isEmpty) {
-                        Utils.showAlertDialog(context, "Text box cannot be empty");
-                      } else {
-                        AddApiProgram(context, coordinatorControllerp.text);
-                      }
-                    },
-                    child: Text('Add'),
-                  ),
-                ],
-              ),
-            ),
-
-            isLoadingp
-                ? Center(child: CircularProgressIndicator())
-                : error.isNotEmpty
-                ? Center(child: Text(error))
-                : SizedBox(
-              height: 200,  // Set a fixed height for the ListView
-              child: ListView.builder(
-                itemCount: filteredProgramList.length,
-                itemBuilder: (context, index) {
-                  final program = filteredProgramList[index];
-                  return ListTile(
-                    title: GestureDetector(
-                      onTap: () {
-                        print("Clicked on: ${program['name']}");
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => SubProgramScreen(
-                              employeeId: program['id'],
-                            ),
-                          ),
-                        );
-                      },
-                      child: Text(' ${program['name']}'),
-                    ),
-                    subtitle: program['alternative'] != null
-                        ? Text('Alternative: ${program['alternative']}')
-                        : null,
-                    trailing: IconButton(
-                      icon: Icon(Icons.delete, color: Colors.red),
-                      onPressed: () {
-                        print(program['name']);
-                        deleteApiProgram(context, program['name']);
-                      },
-                    ),
-                  );
-                },
-              ),
-            ),
+            // DropdownButtonFormField<String>(
+            //   padding: const EdgeInsets.only(
+            //     left: 15.0,
+            //     right: 15.0,
+            //   ),
+            //   value: programString.isNotEmpty &&
+            //       programList.any((item) => item['name'] == programString)
+            //       ? programString
+            //       : null,
+            //   onChanged: (String? value) {
+            //     setState(() {
+            //       programString = value ?? '';
+            //       subprogramList = getNamesWithParentId(
+            //           apiResponse,
+            //           getIdFromName(apiResponse, programString)
+            //       );
+            //     });
+            //   },
+            //   items: programList.map((item) => DropdownMenuItem<String>(
+            //     value: item['name'].toString(),
+            //     child: Text(item['name'].toString()),
+            //   )).toList(),
+            //   decoration: InputDecoration(
+            //     labelText: 'Select Program',
+            //     filled: true,
+            //     // fillColor: Colors.white,
+            //     contentPadding: EdgeInsets.symmetric(vertical: 13.0, horizontal: 10.0),
+            //     // border: OutlineInputBorder(
+            //     //   borderRadius: BorderRadius.circular(10.0),
+            //     // ),
+            //   ),
+            // ),
+            // // SizedBox(height: 15.0),
+            //
+            //
+            // Padding(
+            //   padding: const EdgeInsets.all(15.0),
+            //   child: Row(
+            //     children: [
+            //       Expanded(
+            //         child: TextField(
+            //           controller: coordinatorControllerp,
+            //           decoration: InputDecoration(
+            //             hintText: 'Fill Sub Program',
+            //           ),
+            //           onChanged: (query) {
+            //             filterMemberListp(query);
+            //           },
+            //         ),
+            //       ),
+            //       SizedBox(width: 10),
+            //       ElevatedButton(
+            //         onPressed: () {
+            //           if (coordinatorControllerp.text.isEmpty) {
+            //             Utils.showAlertDialog(context, "Text box cannot be empty");
+            //           } else {
+            //             AddApiProgram(context, coordinatorControllerp.text);
+            //           }
+            //         },
+            //         child: Text('Add'),
+            //       ),
+            //     ],
+            //   ),
+            // ),
+            //
+            // isLoadingp
+            //     ? Center(child: CircularProgressIndicator())
+            //     : error.isNotEmpty
+            //     ? Center(child: Text(error))
+            //     : SizedBox(
+            //   height: 200,  // Set a fixed height for the ListView
+            //   child: ListView.builder(
+            //     itemCount: filteredProgramList.length,
+            //     itemBuilder: (context, index) {
+            //       final program = filteredProgramList[index];
+            //       return ListTile(
+            //         title: GestureDetector(
+            //           onTap: () {
+            //             print("Clicked on: ${program['name']}");
+            //             Navigator.push(
+            //               context,
+            //               MaterialPageRoute(
+            //                 builder: (context) => SubProgramScreen(
+            //                   employeeId: program['id'],
+            //                 ),
+            //               ),
+            //             );
+            //           },
+            //           child: Text(' ${program['name']}'),
+            //         ),
+            //         subtitle: program['alternative'] != null
+            //             ? Text('Alternative: ${program['alternative']}')
+            //             : null,
+            //         trailing: IconButton(
+            //           icon: Icon(Icons.delete, color: Colors.red),
+            //           onPressed: () {
+            //             print(program['name']);
+            //             deleteApiProgram(context, program['name']);
+            //           },
+            //         ),
+            //       );
+            //     },
+            //   ),
+            // ),
 
             SizedBox(height: 15.0),
           ],
@@ -477,8 +477,7 @@ class _SalesSettingState extends State<SalesSetting> {
     };
     print(data);
     try {
-      final response =
-      await dio.post(Constant.BASE_URL + "api/cordinatorDeleteList", data: data);
+      final response = await _dio.post(Constant.BASE_URL + "api/cordinatorDeleteList", data: data);
 
       if (response.statusCode == 200) {
         pd.close(delay: 0);
@@ -545,8 +544,7 @@ class _SalesSettingState extends State<SalesSetting> {
     };
     print(data);
     try {
-      final response =
-      await dio.post(Constant.BASE_URL + "api/programSubprogramDeleteList", data: data);
+      final response = await _dio.post(Constant.BASE_URL + "api/programSubprogramDeleteList", data: data);
 
       if (response.statusCode == 200) {
         pd.close(delay: 0);
@@ -685,10 +683,6 @@ class _SalesSettingState extends State<SalesSetting> {
         print(response.toString());
 
         Map<String, dynamic> responseMap = json.decode(response.toString());
-
-        // You may need to create a model class for the API response
-        // For example, if it's similar to the AddMember class, you can use it here
-
         message = responseMap['message'].toString();
         String status = responseMap['status'].toString();
 
