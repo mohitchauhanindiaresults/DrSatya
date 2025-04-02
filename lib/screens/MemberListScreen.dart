@@ -12,6 +12,7 @@ class MemberListScreen extends StatefulWidget {
   _MemberListScreenState createState() => _MemberListScreenState();
 }
 
+
 class _MemberListScreenState extends State<MemberListScreen> {
   TextEditingController searchController = TextEditingController();
   List<Map<String, dynamic>> memberList = [];
