@@ -102,11 +102,9 @@ class _AddEnquiryScreenState extends State<AddEnquiryScreen> {
   }
 
   Future<void> fetchCities(String state) async {
-    print("chut786");
 
     print(statesJson);
     print(state);
-    print("land786");
 
     print(Utils.getIdBySubNameState(statesJson, state));
     try {

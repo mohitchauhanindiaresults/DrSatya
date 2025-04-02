@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:sn_progress_dialog/progress_dialog.dart';
 import 'package:http/http.dart' as http;
 import '../model/LoginApiModel.dart';
@@ -27,9 +28,23 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     initate();
+    main2();
+  }
+  void main2() {
+    double lat1 = 12.9716;  // Example: Bangalore
+    double lon1 = 77.5946;
+
+    double lat2 = 28.7041;  // Example: Delhi
+    double lon2 = 77.1025;
+
+    double distanceInMeters = Geolocator.distanceBetween(lat1, lon1, lat2, lon2);
+    double distanceInMeters2 = Geolocator.bearingBetween(lat1, lon1, lat2, lon2);
+    double distanceInKm = distanceInMeters / 1000;  // Convert to kilometers
+
+    print('Distance: ${distanceInKm.toStringAsFixed(2)} km');
+    print('Distancedd: ${distanceInMeters2.toStringAsFixed(2)} km');
   }
 
   @override
@@ -325,7 +340,6 @@ class _LoginScreenState extends State<LoginScreen> {
           Utils.saveStringToPrefs(Constant.DESIGNATION, profileDetails.user!.designation.toString());
           Utils.saveStringToPrefs(Constant.PASSWORD, passwordcontroller.text);
           Utils.saveStringToPrefs(Constant.EMAIL, emailController.text);
-
           Fluttertoast.showToast(
             msg: message,
             toastLength: Toast.LENGTH_SHORT,
