@@ -606,8 +606,33 @@ class _AddBilllingFormState extends State<AddBilllingForm> {
                           context, "Numbers cannot be same !!");
                     } else {
                       // All controllers have non-empty text, proceed with addEnquiry.
+                      
+                    //  print("werwer");
+                      if (
+                      firstNameController.text.isEmpty ||
+                          lastNameController.text.isEmpty ||
+                          mobileController.text.isEmpty ||
+                          alternativeMobileController.text.isEmpty ||
+                          transectionController.text.isEmpty ||
+                          programString.isEmpty ||
+                          subprogramString.isEmpty ||
+                          packageDetail.text.isEmpty ||
+                          Validity.text.isEmpty ||
+                          treatment.text.isEmpty ||
+                          payment_recived.text.isEmpty ||
+                          balance.text.isEmpty ||
+                          recivedinwords.text.isEmpty ||
+                          PaymentMode.text.isEmpty ||
+                          selectedCoordinator.isEmpty ||
+                          Status.text.isEmpty ||
+                          Source.text.isEmpty
+                      ) {
+                        Fluttertoast.showToast(msg: "All fields are required.");
+                        return;
+                      }else{
+                        addEnquiry(context);
 
-                      addEnquiry(context);
+                      }
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -727,8 +752,7 @@ class _AddBilllingFormState extends State<AddBilllingForm> {
     };
     print(data);
     try {
-      final response =
-          await dio.post(Constant.BASE_URL + "api/addBilling", data: data);
+      final response = await dio.post(Constant.BASE_URL + "api/addBilling", data: data);
 
       if (response.statusCode == 200) {
         pd.close(delay: 0);
@@ -781,7 +805,7 @@ class _AddBilllingFormState extends State<AddBilllingForm> {
       }
     } catch (e) {
       pd.close(delay: 0);
-      Utils.showAlertDialog(context, 'SOMETHING WENT WRONG !!');
+      Utils.showAlertDialog(context, 'SOMETHING WENT WRONG !! $e');
       throw Exception('An error occurred during enquiry');
     }
   }

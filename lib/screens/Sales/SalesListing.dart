@@ -86,9 +86,10 @@ class _SalesListingState extends State<SalesListing> {
             Row(
               children: [
                 Expanded(
-                  flex: 1,
+                  flex: 1, // Ensures it takes up available space
                   child: DropdownButton<String>(
                     value: selectedStatus,
+                    isExpanded: true, // Ensures it doesn't overflow
                     hint: Text('Select a status'),
                     onChanged: (String? newValue) {
                       setState(() {
@@ -108,6 +109,8 @@ class _SalesListingState extends State<SalesListing> {
                   flex: 1,
                   child: DropdownButton<String>(
                     value: selectedPotentiality,
+                    isExpanded: true, // Ensures it doesn't overflow
+
                     onChanged: (String? newValue) {
                       setState(() {
                         selectedPotentiality = newValue ?? '';
@@ -126,6 +129,8 @@ class _SalesListingState extends State<SalesListing> {
                   flex: 1,
                   child: DropdownButton<String>(
                     value: selectedSource,
+                    isExpanded: true, // Ensures it doesn't overflow
+
                     onChanged: (String? newValue) {
                       setState(() {
                         selectedSource = newValue ?? '';
