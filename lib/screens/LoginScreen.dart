@@ -96,7 +96,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 controller: emailController,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
-                  labelText: 'Email',
+                  labelText: 'Phone',
                   hintText: 'Enter your email',
                   prefixIcon: Icon(Icons.phone),
                   border: OutlineInputBorder(

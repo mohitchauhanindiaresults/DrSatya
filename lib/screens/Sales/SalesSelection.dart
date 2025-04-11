@@ -63,7 +63,7 @@ import 'package:satya_new/screens/Sales/SalesListing.dart';
         appBar: AppBar(
           backgroundColor: Color(0xFF14B3B4),
           title: Text(
-            'Craete Lead',
+            'Create Lead',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
@@ -72,19 +72,6 @@ import 'package:satya_new/screens/Sales/SalesListing.dart';
             ),
           ),
           actions: [
-            IconButton(
-              icon: Icon(Icons.settings),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                       SalesSetting()
-                  ),
-                );
-                // Add your settings button functionality here
-              },
-            ),
             IconButton(
               icon: Icon(Icons.list),
               onPressed: () {

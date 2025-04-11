@@ -34,7 +34,7 @@ class _SalesSettingState extends State<SalesSetting> {
   @override
   void initState() {
     super.initState();
-    fetchMemberList(); // Call the method to fetch the member list
+ //   fetchMemberList(); // Call the method to fetch the member list
     fetchProgramList();
     fetchSubProgramList();
   }
@@ -61,7 +61,7 @@ class _SalesSettingState extends State<SalesSetting> {
             names.add(coordinator['name']);
           }
 
-          // Now 'names' contains the list of names from 'cordinatorList'
+          // Now 'names' contains the list of names from 'cordinatorList'122
           print(names);
         });
 
@@ -148,7 +148,7 @@ class _SalesSettingState extends State<SalesSetting> {
       appBar: AppBar(
         backgroundColor: Color(0xFF14B3B4),
         title: Text(
-          'Setting Configuration',
+          'Settings',
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
@@ -163,75 +163,75 @@ class _SalesSettingState extends State<SalesSetting> {
           children: [
             SizedBox(height: 15.0),
 
-            // Coordinator Section
-            Center(
-              child: Text(
-                'Coordinator names',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1,
-                  color: Colors.black,
-                ),
-              ),
-            ),
-
-            Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: coordinatorController,
-                      decoration: InputDecoration(
-                        hintText: 'Fill Coordinator',
-                      ),
-                      onChanged: (query) {
-                        filterMemberList(query);
-                      },
-                    ),
-                  ),
-                  SizedBox(width: 10),
-                  ElevatedButton(
-                    onPressed: () {
-                      if (coordinatorController.text.isEmpty) {
-                        Utils.showAlertDialog(context, "Text box cannot be empty");
-                      } else {
-                        AddApi(context, coordinatorController.text);
-                      }
-                    },
-                    child: Text('Add'),
-                  ),
-                ],
-              ),
-            ),
-
-            isLoadingp
-                ? Center(child: CircularProgressIndicator())
-                : error.isNotEmpty
-                ? Center(child: Text(error))
-                : SizedBox(
-              height: 200,  // Set a fixed height for the ListView
-              child: ListView.builder(
-                itemCount: filteredMemberList.length,
-                itemBuilder: (context, index) {
-                  final member = filteredMemberList[index];
-                  return ListTile(
-                    title: Text(' ${member['name']}'),
-                    subtitle: member['alternative'] != null
-                        ? Text('Alternative: ${member['alternative']}')
-                        : null,
-                    trailing: IconButton(
-                      icon: Icon(Icons.delete, color: Colors.red),
-                      onPressed: () {
-                        print(member['name']);
-                        deleteApi(context, member['name']);
-                      },
-                    ),
-                  );
-                },
-              ),
-            ),
+            // // Coordinator Section
+            // Center(
+            //   child: Text(
+            //     'Coordinator names',
+            //     style: TextStyle(
+            //       fontSize: 16,
+            //       fontWeight: FontWeight.bold,
+            //       letterSpacing: 1,
+            //       color: Colors.black,
+            //     ),
+            //   ),
+            // ),
+            //
+            // Padding(
+            //   padding: const EdgeInsets.all(15.0),
+            //   child: Row(
+            //     children: [
+            //       Expanded(
+            //         child: TextField(
+            //           controller: coordinatorController,
+            //           decoration: InputDecoration(
+            //             hintText: 'Fill Coordinator',
+            //           ),
+            //           onChanged: (query) {
+            //             filterMemberList(query);
+            //           },
+            //         ),
+            //       ),
+            //       SizedBox(width: 10),
+            //       ElevatedButton(
+            //         onPressed: () {
+            //           if (coordinatorController.text.isEmpty) {
+            //             Utils.showAlertDialog(context, "Text box cannot be empty");
+            //           } else {
+            //             AddApi(context, coordinatorController.text);
+            //           }
+            //         },
+            //         child: Text('Add'),
+            //       ),
+            //     ],
+            //   ),
+            // ),
+            //
+            // isLoadingp
+            //     ? Center(child: CircularProgressIndicator())
+            //     : error.isNotEmpty
+            //     ? Center(child: Text(error))
+            //     : SizedBox(
+            //   height: 200,  // Set a fixed height for the ListView
+            //   child: ListView.builder(
+            //     itemCount: filteredMemberList.length,
+            //     itemBuilder: (context, index) {
+            //       final member = filteredMemberList[index];
+            //       return ListTile(
+            //         title: Text(' ${member['name']}'),
+            //         subtitle: member['alternative'] != null
+            //             ? Text('Alternative: ${member['alternative']}')
+            //             : null,
+            //         trailing: IconButton(
+            //           icon: Icon(Icons.delete, color: Colors.red),
+            //           onPressed: () {
+            //             print(member['name']);
+            //             deleteApi(context, member['name']);
+            //           },
+            //         ),
+            //       );
+            //     },
+            //   ),
+            // ),
 
             SizedBox(height: 15.0),
 
@@ -244,6 +244,20 @@ class _SalesSettingState extends State<SalesSetting> {
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1,
                   color: Colors.black,
+                ),
+              ),
+            ),
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                child: Text(
+                  'Note : To add subprograms, click on the Programs section and click to proceed.',
+                  style: TextStyle(
+                    fontSize: 14,
+                //    fontWeight: FontWeight.bold,
+                             //     letterSpacing: 1,
+                    color: Colors.black,
+                  ),
                 ),
               ),
             ),
@@ -443,6 +457,9 @@ class _SalesSettingState extends State<SalesSetting> {
       ),
     );
   }
+
+
+
   void filterMemberList(String query) {
     setState(() {
       filteredMemberList = memberList

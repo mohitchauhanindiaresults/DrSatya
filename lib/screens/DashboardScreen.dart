@@ -184,7 +184,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       String label, IconData icon, Color color, BuildContext context) {
     return ElevatedButton(
       onPressed: () {
-        if ("Add Users" == label) {
+        if ("Admin" == label) {
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -320,7 +320,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           }
         }
 
-        addIfValid("1", "Add Users");
+        addIfValid("1", "Admin");
         addIfValid("2", "Master Data");
         addIfValid("3", "Sales");
         addIfValid("4", "Billing");
