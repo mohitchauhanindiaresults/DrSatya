@@ -1,22 +1,40 @@
 import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:satya_new/screens/Sales/SalesListing.dart';
-import 'package:satya_new/screens/Sales/SalesSetting.dart';
 import 'package:satya_new/screens/Yoga/AdminUserLIsting.dart';
 import 'package:sn_progress_dialog/progress_dialog.dart';
-import '../model/AddMember.dart';
-import '../utils/Constant.dart';
-import '../utils/Utils.dart';
+import '../../utils/ApiInterceptor.dart';
+import '../../utils/Constant.dart';
+import '../../utils/Utils.dart';
 
-class AddMemberScreen extends StatefulWidget {
+class UpdateMemberScreen extends StatefulWidget {
+  final String name;
+  final String email;
+  final List<String> roles;
+  final String mobile;
+  final String id;
+  final String password;
+  final String status;
+
+  const UpdateMemberScreen({
+    super.key,
+    required this.name,
+    required this.email,
+    required this.roles,
+    required this.mobile,
+    required this.id,
+    required this.password,
+    required this.status,
+  });
+
   @override
-  _AddMemberScreenState createState() => _AddMemberScreenState();
+  _UpdateMemberScreenState createState() => _UpdateMemberScreenState();
 }
 
-class _AddMemberScreenState extends State<AddMemberScreen> {
-
+class _UpdateMemberScreenState extends State<UpdateMemberScreen> {
+  final Dio _dio = ApiInterceptor.createDio(); // Use ApiInterceptor to create Dio instance
   // Define a controller for each text field
   TextEditingController roleController = TextEditingController();
   TextEditingController nameController = TextEditingController();
@@ -24,6 +42,9 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passsword = TextEditingController();
   String jsonResponseeee = "";
+  String selectedStatus = 'Active'; // default
+  List<String> statusOptions = ['ACTIVE', 'INACTIVE'];
+
   final List<Map<String, String>> options = [
     {"id": "1", "label": "Admin"},
     {"id": "2", "label": "Master Data"},
@@ -34,6 +55,21 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
     {"id": "20", "label": "Reports"},
     {"id": "21", "label": "Store"},
   ];
+  @override
+  void initState() {
+    super.initState();
+    selectedValues = options
+        .where((option) => widget.roles.contains(option['label']))
+        .map((option) => option['id']!)
+        .toList();
+    selectedStatus = widget.status;
+    nameController.text = widget.name;
+    emailController.text = widget.email;
+    mobileController.text = widget.mobile;
+    passsword.text = widget.password;
+
+  }
+
   List<String> selectedValues = [];
   @override
   Widget build(BuildContext context) {
@@ -41,7 +77,7 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
       appBar: AppBar(
         backgroundColor: Color(0xFF14B3B4),
         title: Text(
-          'Admin',
+          'Update Data',
           style: TextStyle(
             fontSize: 20, // Adjust the font size
             fontWeight: FontWeight.bold, // Add boldness
@@ -49,35 +85,6 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
             color: Colors.white, // Text color
           ),
         ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.settings),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        SalesSetting()
-                ),
-              );
-              // Add your settings button functionality here
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.list),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        AdminUserLIsting()
-                ),
-              );
-              // Add your settings button functionality here
-            },
-          ),
-        ],
-
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -94,10 +101,6 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Title
-             //   SizedBox(height: 50.0),
-
-                // Form
                 Form(
                   child: Column(
                     children: [
@@ -127,6 +130,32 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
                           );
                         }).toList(),
                       ),
+
+                      SizedBox(height: 15.0),
+                      DropdownButtonFormField<String>(
+                        value: selectedStatus,
+                        decoration: InputDecoration(
+                          labelText: 'Status',
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          contentPadding: EdgeInsets.symmetric(vertical: 13.0, horizontal: 10.0),
+                        ),
+                        items: statusOptions.map((String status) {
+                          return DropdownMenuItem<String>(
+                            value: status,
+                            child: Text(status),
+                          );
+                        }).toList(),
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            selectedStatus = newValue!;
+                          });
+                        },
+                      ),
+
                       SizedBox(height: 15.0),
 
                       // Name field
@@ -182,13 +211,12 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
                 // Add Member button
                 ElevatedButton(
                   onPressed: () {
-                    // Add logic to handle adding a member
-                    // For example, you can print the values for now
-
-                  if (nameController.text.isEmpty) {
-                      Utils.showAlertDialog(
-                          context, "Name field cannot be empty");
-                    } else if (mobileController.text.isEmpty) {
+                    FocusScope.of(context).unfocus();
+                    if (nameController.text.isEmpty) {
+                      Utils.showAlertDialog(context, "Name field cannot be empty");
+                    } else if (selectedValues.isEmpty) {
+                      Utils.showAlertDialog(context, "Please select atleast one role");
+                    }else if (mobileController.text.isEmpty) {
                       Utils.showAlertDialog(context, "Mobile field cannot be empty");
                     } else if (mobileController.text.length != 10 || !RegExp(r'^[0-9]+$').hasMatch(mobileController.text)) {
                       Utils.showAlertDialog(context, "Mobile number should be 10 digits");
@@ -200,7 +228,7 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
                       Utils.showAlertDialog(context, "Password should contain special character,number,alphabet & capital letter");
                     }
                     else {
-                      addMember(context);
+                      updateMember(context);
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -211,10 +239,10 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
                     elevation: 5,
                     shadowColor: Colors.grey,
                     padding:
-                        EdgeInsets.symmetric(vertical: 10.0, horizontal: 40.0),
+                    EdgeInsets.symmetric(vertical: 10.0, horizontal: 40.0),
                   ),
                   child: Text(
-                    'Add Coordinator',
+                    'Update Coordinator',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -229,93 +257,51 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
       ),
     );
   }
-
-  Future<void> addMember(BuildContext context) async {
-    print("object"+selectedValues.join(","));
+  Future<void> updateMember(BuildContext context) async {
+    FocusScope.of(context).unfocus(); // 👈 Close keyboard
     ProgressDialog pd = ProgressDialog(context: context);
     pd.show(msg: "Please Wait");
-    // String role="";
-    // String designation="";
-    // if(roleController.text=="Super Admin"){
-    //   role="1";
-    //   designation="1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21";
-    // }else if(roleController.text=="Center Head"){
-    //   role="2";
-    //   designation="2,3,4,5,7,8,9,15,17,18,19,21";
-    // }else if(roleController.text=="Office Coordinator"){
-    //   role="3";
-    //   designation="15,17,18,19";
-    // }else if(roleController.text=="Receptionist"){
-    //   role="4";
-    //   designation="2,4,8,12,21";
-    //
-    // }else if(roleController.text=="Doctor"){
-    //   role="5";
-    //   designation="6,9,13,14";
-    //
-    // }else if(roleController.text=="Holistic Counselor"){
-    //   role="6";
-    //   designation="6,9,10,13,14,21";
-    //
-    // }else if(roleController.text=="Sales Executive"){
-    //   role="7";
-    //   designation="2,3,4,5,19,21";
-    //
-    // }else if(roleController.text=="Yoga Teacher"){
-    //   role="8";
-    //   designation="7,21";
-    //
-    // }else if(roleController.text=="Coordinator"){
-    //   role="9";
-    //   designation="2,3,4,5,19,21";
-    //
-    // }
-   String message = "";
 
-    final Dio dio = Dio();
-    AddMember? profileDetails;
     final data = {
       "name": nameController.text,
       "mobile": mobileController.text,
       "designation": selectedValues.join(","),
       "role": "9",
       "password": passsword.text,
+      "id": widget.id,
+      "status": selectedStatus.toString().toUpperCase(),
     };
-    print("hjjhk"+data.toString());
-    String error = "";
+
+    print("Request Data: $data");
 
     try {
-      final response = await dio.post(Constant.BASE_URL + "api/adduser", data: data);
+      final response = await _dio.post(
+        Constant.BASE_URL + "api/updateuser",
+        data: data,
+      );
 
+      pd.close(delay: 0);
+      print("Response Code: ${response.statusCode}");
+      print("Response: ${response.toString()}");
 
-      print("1234567890"+response.statusCode.toString());
       if (response.statusCode == 200) {
-        pd.close(delay: 0);
         final jsonResponse = response.data;
-        Utils.printLongString(response.toString());
-        jsonResponseeee = response.toString();
 
-        Map<String, dynamic> responseMap = json.decode(response.toString());
-        profileDetails = AddMember.fromJson(responseMap);
+        final String status = jsonResponse['status']?.toString() ?? "";
+        final String message = jsonResponse['message']?.toString() ?? "Something went wrong";
 
-        message = profileDetails.message.toString();
-        String status = profileDetails.status.toString();
-        //     print("098765432"+profileDetails.error.details.toString());
-        print(message);
-
-        if (status == "success") {
+        if (status.toLowerCase() == "success") {
           Fluttertoast.showToast(
-              msg: message,
-              toastLength: Toast.LENGTH_SHORT,
-              gravity: ToastGravity.BOTTOM,
-              backgroundColor: Colors.grey,
-              textColor: Colors.white);
+            msg: message,
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            backgroundColor: Colors.grey,
+            textColor: Colors.white,
+          );
           Navigator.pop(context);
+          Navigator.push(context, MaterialPageRoute(builder: (context) => AdminUserLIsting()));
         } else {
-          pd.close(delay: 0);
-          Utils.showAlertDialog(
-              context,message);
-
+          Utils.showAlertDialog(context, message);
           Fluttertoast.showToast(
             msg: message,
             toastLength: Toast.LENGTH_SHORT,
@@ -324,10 +310,9 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
             textColor: Colors.white,
           );
         }
-      }else if(response.statusCode == 422){
-        Utils.showAlertDialog(context, "Number already exist");
+      } else if (response.statusCode == 422) {
+        Utils.showAlertDialog(context, "Number already exists");
       } else {
-        pd.close(delay: 0);
         Fluttertoast.showToast(
           msg: "Internal Server Error",
           toastLength: Toast.LENGTH_SHORT,
@@ -335,23 +320,22 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
           backgroundColor: Colors.grey,
           textColor: Colors.white,
         );
-        throw Exception('Login failed');
+        throw Exception('Update failed');
       }
     } catch (e) {
-
-      print('Error: $e');
       pd.close(delay: 0);
-      Utils.showAlertDialog(context, "Number already exist");
+      print('Error: $e');
 
-      Map<String, dynamic> response = json.decode(jsonResponseeee);
+      try {
+        final errorResponse = json.decode(jsonResponseeee);
+        final String errorMessage = errorResponse['error'] ?? "Unexpected error occurred";
+        Utils.showAlertDialog(context, errorMessage);
+      } catch (e) {
+        Utils.showAlertDialog(context, "Something went wrong.");
+      }
 
-      // Retrieve the value of the "message" key
-      String message = response['error'];
-
-      // Print the result
-      print('Message: $message');
-      Utils.showAlertDialog(context, message);
-      throw Exception('An error occurred during login');
+      throw Exception('An error occurred during update');
     }
   }
+
 }

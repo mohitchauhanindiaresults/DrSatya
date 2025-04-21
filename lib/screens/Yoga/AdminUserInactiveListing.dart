@@ -1,16 +1,15 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:satya_new/screens/Yoga/AdminUserInactiveListing.dart';
 import 'package:satya_new/screens/Yoga/UpdateMemberScreen.dart';
 
 import '../../utils/ApiInterceptor.dart';
 
-class AdminUserLIsting extends StatefulWidget {
+class AdminUserInactiveLIsting extends StatefulWidget {
   @override
-  _AdminUserLIstingState createState() => _AdminUserLIstingState();
+  _AdminUserInactiveLIstingState createState() => _AdminUserInactiveLIstingState();
 }
 
-class _AdminUserLIstingState extends State<AdminUserLIsting> {
+class _AdminUserInactiveLIstingState extends State<AdminUserInactiveLIsting> {
   late Future<List<Map<String, dynamic>>> userDetails;
   final Dio _dio = ApiInterceptor.createDio();
   TextEditingController _searchController = TextEditingController();
@@ -39,7 +38,7 @@ class _AdminUserLIstingState extends State<AdminUserLIsting> {
       appBar: AppBar(
         backgroundColor: Color(0xFF14B3B4),
         title: Text(
-          'Active Coordinators',
+          'Inactive Coordinators',
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
@@ -47,28 +46,7 @@ class _AdminUserLIstingState extends State<AdminUserLIsting> {
           ),
         ),
         actions: [
-          Padding(
-            padding: EdgeInsets.only(right: 12.0),
-            child: Container(
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.red,),
-                shape: BoxShape.circle, // use BoxShape.rectangle for rounded square
-                color: Colors.white, // background color inside the border
-              ),
-              child: IconButton(
-                icon: Icon(Icons.group_off, color: Colors.red),
-                tooltip: 'Show Inactive Members',
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => AdminUserInactiveLIsting(), // Replace accordingly
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
+
         ],
       ),
       body: Container(
@@ -81,7 +59,6 @@ class _AdminUserLIstingState extends State<AdminUserLIsting> {
         ),
         child: Column(
           children: [
-
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 18.0),
               child: Container(
@@ -160,7 +137,9 @@ class _AdminUserLIstingState extends State<AdminUserLIsting> {
                                 print('Tapped on ${user['name']}');
                                 print('Tapped on ${user['email']}');
                                 print('Tapped on ${user['mobile']}');
-                                print('Tapped on ${user['status']}');
+                                print('Tapped on ${user['designation_name']}');
+                                print('Tapped onassa ${user['id']}');
+                                print('Tapped onassa ${user['status']}');
                                 Navigator.push(context, MaterialPageRoute(builder: (context) => UpdateMemberScreen(name:user['name'],email: user['email'],roles:(user['designation_name'] as List).map((e) => e.toString()).toList(),mobile: user['mobile'],id:user['id'].toString(),password:user['password_text'].toString(),status:user['status'].toString())));
                               },
                             ),
@@ -180,23 +159,27 @@ class _AdminUserLIstingState extends State<AdminUserLIsting> {
 
   Future<List<Map<String, dynamic>>> fetchUserDetails() async {
     const userApiEndpoint = 'https://clients.charumindworks.com/satya/api/getAllUsersList';
+
     try {
-      final response = await _dio.get(userApiEndpoint);
+      final response = await _dio.get(
+        userApiEndpoint,
+        queryParameters: {"status": "INACTIVE"}, // 👈 Pass status as query param
+      );
 
       List<Map<String, dynamic>> users = (response.data['AllUsers'] as List)
           .map<Map<String, dynamic>>((user) => {
-        'name': user['name'],
+         'name': user['name'],
         'email': user['email'],
         'mobile': user['mobile'],
         'designation_name': user['designation_name'],
         'password_text': user['password_text'],
         'id': user['id'],
         'status': user['status'],
-
       }).toList();
+
       setState(() {
         _allUsers = users;
-        _filteredUsers = [];
+        _filteredUsers = []; // Optional: You can also filter later based on UI logic
       });
 
       return users;

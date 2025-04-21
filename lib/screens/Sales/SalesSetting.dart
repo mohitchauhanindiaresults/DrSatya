@@ -18,10 +18,14 @@ class SalesSetting extends StatefulWidget {
 class _SalesSettingState extends State<SalesSetting> {
   TextEditingController coordinatorController = TextEditingController();
   TextEditingController coordinatorControllerp = TextEditingController();
+  TextEditingController addCenterController = TextEditingController();
   List<Map<String, dynamic>> memberList = [];
   List<Map<String, dynamic>> filteredMemberList = [];
   List<Map<String, dynamic>> programList = [];
+  List<Map<String, dynamic>> centerList = [];
   List<Map<String, dynamic>> filteredProgramList = [];
+  List<Map<String, dynamic>> filteredCenterList = [];
+  List<Map<String, dynamic>> filteredCenter = [];
   bool isLoading = true;
   bool isLoadingp = true;
   String error = '';
@@ -37,6 +41,54 @@ class _SalesSettingState extends State<SalesSetting> {
  //   fetchMemberList(); // Call the method to fetch the member list
     fetchProgramList();
     fetchSubProgramList();
+    fetchCenters();
+  }
+
+
+  Future<void> fetchCenters() async {
+    const url = 'https://clients.charumindworks.com/satya/api/get-all-centers';
+    try {
+      final response = await _dio.get(url);
+      if (response.statusCode == 200) {
+        final List<dynamic> data = response.data['centers'] ?? [];
+        setState(() {
+          filteredCenterList = data.cast<Map<String, dynamic>>();
+          isLoadingp = false;
+          error = "";
+        });
+      } else {
+        setState(() {
+          error = "Failed to load centers";
+          isLoadingp = false;
+        });
+      }
+    } catch (e) {
+      print("Error fetching centers: $e");
+      setState(() {
+        error = "Something went wrong";
+        isLoadingp = false;
+      });
+    }
+  }
+
+  Future<void> addCenter(BuildContext context, String name) async {
+    const url = 'https://clients.charumindworks.com/satya/api/add-centers';
+    try {
+      final response = await _dio.post(
+        url,
+        data: FormData.fromMap({'name': name}),
+      );
+      if (response.statusCode == 200 && response.data['status'] == "success") {
+        Fluttertoast.showToast(msg: "Center added successfully");
+        fetchCenters();
+        addCenterController.text='';
+      } else {
+        Utils.showAlertDialog(context, response.data['message'] ?? "Failed to add center");
+      }
+    } catch (e) {
+      print("Error adding center: $e");
+      Utils.showAlertDialog(context, "An error occurred while adding the center");
+    }
   }
 
   // Method to fetch member list from API
@@ -84,7 +136,7 @@ class _SalesSettingState extends State<SalesSetting> {
       // Replace 'YOUR_API_ENDPOINT' with the actual API endpoint
       Response response = await _dio.get('${Constant.BASE_URL_2}programSubprogramAddList');
       Map<String, dynamic> responseData = response.data;
-      // print(response.data);
+      print(response.data);
 
       if (responseData['status'] == 'false') {
         List<dynamic> coordinatorList = responseData['programList'];
@@ -94,6 +146,7 @@ class _SalesSettingState extends State<SalesSetting> {
           programList = List<Map<String, dynamic>>.from(coordinatorList.where((element) => element['parent_id'] == null ));
           filteredProgramList = programList;
           isLoadingp = false;
+          coordinatorControllerp.text='';
           print("uuyiyu"+programList.toString());
           print("uuyidfdffyu"+filteredProgramList.toString());
           // Extracting names and adding them to a separate list
@@ -233,7 +286,7 @@ class _SalesSettingState extends State<SalesSetting> {
             //   ),
             // ),
 
-            SizedBox(height: 15.0),
+            SizedBox(width :1 ,height: 15.0),
 
             // Programs Section
             Center(
@@ -251,7 +304,7 @@ class _SalesSettingState extends State<SalesSetting> {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 15.0),
                 child: Text(
-                  'Note : To add subprograms, click on the Programs section and click to proceed.',
+                  'Note : To add Sub Programs, click on the Programs section and click to proceed.',
                   style: TextStyle(
                     fontSize: 14,
                 //    fontWeight: FontWeight.bold,
@@ -269,7 +322,7 @@ class _SalesSettingState extends State<SalesSetting> {
                     child: TextField(
                       controller: coordinatorControllerp,
                       decoration: InputDecoration(
-                        hintText: 'Fill Program',
+                        hintText: 'Add Program',
                       ),
                       onChanged: (query) {
                         filterMemberListp(query);
@@ -332,7 +385,95 @@ class _SalesSettingState extends State<SalesSetting> {
             ),
 
             SizedBox(height: 15.0),
+            Divider(
+              color: Colors.grey,
+              thickness: 1,
+            ),
 
+            Center(
+              child: Text(
+                'Centers',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: addCenterController,
+                      decoration: InputDecoration(
+                        hintText: 'Add Center',
+                      ),
+                      onChanged: (query) {
+                        filterCenterListp(query);
+                      },
+                    ),
+                  ),
+                  SizedBox(width: 10),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (addCenterController.text.isEmpty) {
+                        Utils.showAlertDialog(context, "Text box cannot be empty");
+                      } else {
+                        addCenter(context, addCenterController.text);
+                      }
+                    },
+                    child: Text('Add'),
+                  ),
+                ],
+              ),
+            ),
+
+            isLoadingp
+                ? Center(child: CircularProgressIndicator())
+                : error.isNotEmpty
+                ? Center(child: Text(error))
+                : SizedBox(
+              height: 200,
+              child: ListView.builder(
+                itemCount: filteredCenterList.length,
+                itemBuilder: (context, index) {
+                  final centers = filteredCenterList[index];
+                  return ListTile(
+                    title: GestureDetector(
+                      onTap: () {
+                        print("object Click");
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //     builder: (context) => SubProgramScreen(
+                        //       employeeId: program['id'],
+                        //     ),
+                        //   ),
+                        // );
+                      },
+                      child: Text(' ${centers['name']}'),
+                    ),
+                    subtitle: centers['alternative'] != null
+                        ? Text('Alternative: ${centers['alternative']}')
+                        : null,
+                    trailing: IconButton(
+                      icon: Icon(Icons.edit, color: Colors.red),
+                      onPressed: () {
+                        // deleteApiProgram(context, centers['name']);
+                        print("object Click");
+                        showUpdateCenterDialog(context,centers['id'].toString());
+                      },
+                    ),
+                  );
+                },
+              ),
+            ),
+
+
+            SizedBox(height: 15.0),
             // Sub Program Section
             // Center(
             //   child: Text(
@@ -459,6 +600,77 @@ class _SalesSettingState extends State<SalesSetting> {
   }
 
 
+  Future<void> showUpdateCenterDialog(BuildContext context, String id) async {
+    TextEditingController nameController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) {
+        bool isLoading = false;
+
+        return StatefulBuilder(
+          builder: (context, setState) {
+            Future<void> updateCenter() async {
+              setState(() => isLoading = true);
+              try {
+
+                var response = await _dio.post(
+                  'https://clients.charumindworks.com/satya/api/update-centers',
+                  data: FormData.fromMap({
+                    'id': id,
+                    'name': nameController.text,
+                  }),
+                  options: Options(contentType: 'multipart/form-data'),
+                );
+
+                if (response.statusCode == 200) {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Center updated successfully!')),
+                  );
+                  fetchCenters();
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Failed: ${response.statusMessage}')),
+                  );
+                }
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Error: $e')),
+                );
+              } finally {
+                setState(() => isLoading = false);
+              }
+            }
+
+            return AlertDialog(
+              title: Text('Update Center'),
+              content: TextField(
+                controller: nameController,
+                decoration: InputDecoration(labelText: 'Enter new name'),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: isLoading ? null : () => Navigator.pop(context),
+                  child: Text('Cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: isLoading ? null : updateCenter,
+                  child: isLoading
+                      ? SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                      : Text('Update'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
 
   void filterMemberList(String query) {
     setState(() {
@@ -474,6 +686,16 @@ class _SalesSettingState extends State<SalesSetting> {
   void filterMemberListp(String query) {
     setState(() {
       filteredProgramList = programList
+          .where((member) =>
+      member['mobile'].toString().contains(query) ||
+          (member['alternative'] != null &&
+              member['alternative'].toString().contains(query)))
+          .toList();
+    });
+  }
+  void filterCenterListp(String query) {
+    setState(() {
+      filteredCenterList = centerList
           .where((member) =>
       member['mobile'].toString().contains(query) ||
           (member['alternative'] != null &&
