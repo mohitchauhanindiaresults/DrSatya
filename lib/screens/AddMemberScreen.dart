@@ -186,9 +186,10 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
                     // For example, you can print the values for now
 
                   if (nameController.text.isEmpty) {
-                      Utils.showAlertDialog(
-                          context, "Name field cannot be empty");
-                    } else if (mobileController.text.isEmpty) {
+                      Utils.showAlertDialog(context, "Name field cannot be empty");
+                    }else if (selectedValues.isEmpty) {
+                    Utils.showAlertDialog(context, "Please select atleast one role");}
+                  else if (mobileController.text.isEmpty) {
                       Utils.showAlertDialog(context, "Mobile field cannot be empty");
                     } else if (mobileController.text.length != 10 || !RegExp(r'^[0-9]+$').hasMatch(mobileController.text)) {
                       Utils.showAlertDialog(context, "Mobile number should be 10 digits");
@@ -326,6 +327,7 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
         }
       }else if(response.statusCode == 422){
         Utils.showAlertDialog(context, "Number already exist");
+        print('Error: ${response.data}');
       } else {
         pd.close(delay: 0);
         Fluttertoast.showToast(

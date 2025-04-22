@@ -19,6 +19,8 @@ class _SalesSettingState extends State<SalesSetting> {
   TextEditingController coordinatorController = TextEditingController();
   TextEditingController coordinatorControllerp = TextEditingController();
   TextEditingController addCenterController = TextEditingController();
+  TextEditingController nameController = TextEditingController();
+
   List<Map<String, dynamic>> memberList = [];
   List<Map<String, dynamic>> filteredMemberList = [];
   List<Map<String, dynamic>> programList = [];
@@ -82,8 +84,8 @@ class _SalesSettingState extends State<SalesSetting> {
         Fluttertoast.showToast(msg: "Center added successfully");
         fetchCenters();
         addCenterController.text='';
-      } else {
-        Utils.showAlertDialog(context, response.data['message'] ?? "Failed to add center");
+      } else if(response.data['status'] == 422) {
+        Utils.showAlertDialog(context, response.data['error'] ?? "Failed to add center");
       }
     } catch (e) {
       print("Error adding center: $e");
@@ -463,6 +465,7 @@ class _SalesSettingState extends State<SalesSetting> {
                       icon: Icon(Icons.edit, color: Colors.red),
                       onPressed: () {
                         // deleteApiProgram(context, centers['name']);
+                        nameController.text=centers['name'];
                         print("object Click");
                         showUpdateCenterDialog(context,centers['id'].toString());
                       },
@@ -601,18 +604,21 @@ class _SalesSettingState extends State<SalesSetting> {
 
 
   Future<void> showUpdateCenterDialog(BuildContext context, String id) async {
-    TextEditingController nameController = TextEditingController();
     showDialog(
       context: context,
       builder: (context) {
         bool isLoading = false;
-
         return StatefulBuilder(
           builder: (context, setState) {
             Future<void> updateCenter() async {
               setState(() => isLoading = true);
               try {
-
+                if(nameController.text.isEmpty){
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Please Enter Name',style: TextStyle(color: Colors.red))),
+                  );
+                  return;
+                }
                 var response = await _dio.post(
                   'https://clients.charumindworks.com/satya/api/update-centers',
                   data: FormData.fromMap({
@@ -646,7 +652,7 @@ class _SalesSettingState extends State<SalesSetting> {
               title: Text('Update Center'),
               content: TextField(
                 controller: nameController,
-                decoration: InputDecoration(labelText: 'Enter new name'),
+                decoration: InputDecoration(labelText: 'Enter Name'),
               ),
               actions: [
                 TextButton(

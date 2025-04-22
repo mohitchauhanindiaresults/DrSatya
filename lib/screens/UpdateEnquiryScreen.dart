@@ -67,6 +67,7 @@ class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
   List<String> countries = [];
   List<String> states = [];
   List<String> cities = [];
+  List<String> centerList = [];
 
   String countryJson = '';
   String statesJson = '';
@@ -76,6 +77,8 @@ class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
   String selectedState = '';
   String selectedCity = '';
   String apiToken = ""; // Variable to store the obtained API token
+  String selectedCoordinator = '';
+  List<String> coordinators = [];
 
 //   Future<void> getAccessToken() async {
 //     final response = await http.get(
@@ -207,11 +210,11 @@ class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
   }
 
   Future<void> fetchCities(String state) async {
-    print("chut786");
+    print("");
 
     print(statesJson);
     print(state);
-    print("land786");
+    print("");
 
     print(Utils.getIdBySubNameState(statesJson, state));
     try {
@@ -242,7 +245,7 @@ class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
   void initState() {
     super.initState();
     centerController.text = Utils.generateTimestampInMilliseconds();
-
+     fetchCenters();
     // Set initial values for dropdowns
     if (countries.isNotEmpty) {
       selectedCountry = countries.first;
@@ -257,6 +260,36 @@ class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
     }
     initaite();
   }
+  Future<void> fetchCenters() async {
+    const url = 'https://clients.charumindworks.com/satya/api/get-all-centers';
+    try {
+      final response = await _dio.get(url);
+      if (response.statusCode == 200) {
+        // final List<dynamic> data = response.data['centers'] ?? [];
+        List data = response.data['centers'];
+
+        setState(() {
+          // filteredCenterList = data.cast<Map<String, dynamic>>();
+          // centerList = List<String>.from(response.data);
+          centerList = data.map<String>((item) => item['name'].toString()).toList();
+          centerController.text=response.data['enquiry_next_generate'];
+          // isLoading = false;
+          // error = "";
+        });
+      } else {
+        setState(() {
+          // error = "Failed to load centers";
+          // isLoading = false;
+        });
+      }
+    } catch (e) {
+      print("Error fetching centers: $e");
+      setState(() {
+        // error = "Something went wrong";
+        // isLoading = false;
+      });
+    }
+  }
 
 
   @override
@@ -265,7 +298,7 @@ class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
       appBar: AppBar(
         backgroundColor: Color(0xFF14B3B4),
         title: Text(
-          'Update Enquiry',
+          'Update Data',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -297,96 +330,7 @@ class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
                         controller: centerController,
                         enabled: false,
                         decoration: InputDecoration(
-                          labelText: 'Id No',
-                          filled: true,
-                          fillColor: Colors.white,
-                          contentPadding: EdgeInsets.symmetric(
-                              vertical: 13.0, horizontal: 10.0),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 15.0),
-                      TextFormField(
-                        controller: firstNameController,
-                        decoration: InputDecoration(
-                          labelText: 'First Name',
-                          filled: true,
-                          fillColor: Colors.white,
-                          contentPadding: EdgeInsets.symmetric(
-                              vertical: 13.0, horizontal: 10.0),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 15.0),
-
-                      TextFormField(
-                        controller: lastNameController,
-                        decoration: InputDecoration(
-                          labelText: 'Last Name',
-                          filled: true,
-                          fillColor: Colors.white,
-                          contentPadding: EdgeInsets.symmetric(
-                              vertical: 13.0, horizontal: 10.0),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 15.0),
-
-                      TextFormField(
-                        controller: mobileController,
-                        keyboardType: TextInputType.phone,
-                        decoration: InputDecoration(
-                          labelText: 'Mobile',
-                          filled: true,
-                          fillColor: Colors.white,
-                          contentPadding: EdgeInsets.symmetric(
-                              vertical: 13.0, horizontal: 10.0),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 15.0),
-                      TextFormField(
-                        controller: alternativeMobileController,
-                        keyboardType: TextInputType.phone,
-                        decoration: InputDecoration(
-                          labelText: 'Alternative Mobile',
-                          filled: true,
-                          fillColor: Colors.white,
-                          contentPadding: EdgeInsets.symmetric(
-                              vertical: 13.0, horizontal: 10.0),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 15.0),
-                      TextFormField(
-                        controller: emailController,
-                        keyboardType: TextInputType.emailAddress,
-                        decoration: InputDecoration(
-                          labelText: 'Email',
-                          filled: true,
-                          fillColor: Colors.white,
-                          contentPadding: EdgeInsets.symmetric(
-                              vertical: 13.0, horizontal: 10.0),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 15.0),
-                      TextFormField(
-                        controller: localityController,
-                        decoration: InputDecoration(
-                          labelText: 'Locality',
+                          labelText: 'Sr No',
                           filled: true,
                           fillColor: Colors.white,
                           contentPadding: EdgeInsets.symmetric(
@@ -423,6 +367,109 @@ class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
                                 dateController.text = formattedDate;
                               }
                             },
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 15.0),
+                      DropdownButtonFormField<String>(
+                        value: selectCenterController.text.isNotEmpty
+                            ? selectCenterController.text
+                            : null,
+                        onChanged: (String? value) {
+                          setState(() {
+                            selectCenterController.text = value!;
+                          });
+                        },
+                        items: centerList.map((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                        decoration: InputDecoration(
+                          labelText: 'Select Center',
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding:
+                          EdgeInsets.symmetric(vertical: 13.0, horizontal: 10.0),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 15.0),
+
+                      TextFormField(
+                        controller: firstNameController,
+                        decoration: InputDecoration(
+                          labelText: 'First Name',
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: EdgeInsets.symmetric(
+                              vertical: 13.0, horizontal: 10.0),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 15.0),
+
+                      TextFormField(
+                        controller: lastNameController,
+                        decoration: InputDecoration(
+                          labelText: 'Last Name',
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: EdgeInsets.symmetric(
+                              vertical: 13.0, horizontal: 10.0),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 15.0),
+
+                      TextFormField(
+                        controller: mobileController,
+                        keyboardType: TextInputType.phone,
+                        decoration: InputDecoration(
+                          labelText: 'Mobile Number',
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: EdgeInsets.symmetric(
+                              vertical: 13.0, horizontal: 10.0),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 15.0),
+                      TextFormField(
+                        controller: alternativeMobileController,
+                        keyboardType: TextInputType.phone,
+                        decoration: InputDecoration(
+                          labelText: 'Alternate Mobile Number',
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: EdgeInsets.symmetric(
+                              vertical: 13.0, horizontal: 10.0),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 15.0),
+                      TextFormField(
+                        controller: emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: InputDecoration(
+                          labelText: 'Email',
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: EdgeInsets.symmetric(
+                              vertical: 13.0, horizontal: 10.0),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
                           ),
                         ),
                       ),
@@ -555,6 +602,22 @@ class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
                       ),
 
                       SizedBox(height: 15.0),
+                      TextFormField(
+                        controller: localityController,
+                        decoration: InputDecoration(
+                          labelText: 'Locality',
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: EdgeInsets.symmetric(
+                              vertical: 13.0, horizontal: 10.0),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                        ),
+                      ),
+
+                      SizedBox(height: 15.0),
+
                       // DropdownButtonFormField<String>(
                       //   value: ageGroupController.text.isNotEmpty
                       //       ? ageGroupController.text
@@ -677,36 +740,26 @@ class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
                       ),
                       SizedBox(height: 15.0),
                       DropdownButtonFormField<String>(
-                        value: selectCenterController.text.isNotEmpty
-                            ? selectCenterController.text
+                        value: selectedCoordinator.isNotEmpty &&
+                            coordinators.contains(selectedCoordinator)
+                            ? selectedCoordinator
                             : null,
                         onChanged: (String? value) {
                           setState(() {
-                            selectCenterController.text = value!;
+                            selectedCoordinator = value ?? '';
+
+
+                            print("gbghbihfjvuhhuhgvbduhsi");
                           });
                         },
-                        items: ['Salimar Bag', 'Ashok Vihar','Online'].map((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value),
-                          );
-                        }).toList(),
+                        items: coordinators
+                            .map((country) => DropdownMenuItem<String>(
+                          value: country,
+                          child: Text(country),
+                        ))
+                            .toList(),
                         decoration: InputDecoration(
-                          labelText: 'Select Center',
-                          filled: true,
-                          fillColor: Colors.white,
-                          contentPadding: EdgeInsets.symmetric(
-                              vertical: 13.0, horizontal: 10.0),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 15.0),
-                      TextFormField(
-                        controller: coordinatorController,
-                        decoration: InputDecoration(
-                          labelText: 'Coordinator',
+                          labelText: 'Select Coordinator',
                           filled: true,
                           fillColor: Colors.white,
                           contentPadding: EdgeInsets.symmetric(
