@@ -13,8 +13,9 @@ import 'DashboardScreen.dart';
 
 class UpdateEnquiryScreen extends StatefulWidget {
   final int employeeId;
+  final String centerId;
 
-  UpdateEnquiryScreen({required this.employeeId});
+  UpdateEnquiryScreen({required this.employeeId,required this.centerId});
 
   @override
   _UpdateEnquiryScreenState createState() => _UpdateEnquiryScreenState();
@@ -68,6 +69,7 @@ class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
   List<String> states = [];
   List<String> cities = [];
   List<String> centerList = [];
+  List<Map<String, dynamic>> memberList = [];
 
   String countryJson = '';
   String statesJson = '';
@@ -175,9 +177,11 @@ class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
         countryJson = response.toString();
         final List<dynamic> data = response.data['country'];
         Set<String> uniqueCountries = data.map((e) => e['name'].toString()).toSet();
-
+        print("object"+uniqueCountries.toString());
         setState(() {
           countries = uniqueCountries.toList();
+          print("object"+countries.toString());
+
         });
       } else {
         throw Exception('Failed to load countries');
@@ -272,7 +276,7 @@ class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
           // filteredCenterList = data.cast<Map<String, dynamic>>();
           // centerList = List<String>.from(response.data);
           centerList = data.map<String>((item) => item['name'].toString()).toList();
-          centerController.text=response.data['enquiry_next_generate'];
+          // centerController.text=response.data['enquiry_next_generate'];
           // isLoading = false;
           // error = "";
         });
@@ -286,6 +290,44 @@ class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
       print("Error fetching centers: $e");
       setState(() {
         // error = "Something went wrong";
+        // isLoading = false;
+      });
+    }
+  }
+  Future<void> fetchMemberList() async {
+    try {
+      // Replace 'YOUR_API_ENDPOINT' with the actual API endpoint
+      Response response = await Dio().get('https://clients.charumindworks.com/satya/api/cordinatorAddList');
+      Map<String, dynamic> responseData = response.data;
+      print( response.data);
+
+      if (responseData['status'] == 'false') {
+        List<dynamic> coordinatorList = responseData['cordinatorList'];
+        print(coordinatorList);
+        setState(() {
+          memberList = List<Map<String, dynamic>>.from(coordinatorList);
+          // filteredMemberList = memberList;
+          // isLoading = false;
+
+          // Extracting names and adding them to a separate list
+          List<String> names = [];
+          for (var coordinator in coordinatorList) {
+            coordinators.add(coordinator['name']);
+          }
+
+          // Now 'names' contains the list of names from 'cordinatorList'
+          print(names);
+        });
+
+      } else {
+        setState(() {
+          // error = 'Failed to fetch data. ${responseData['message']}';
+          // isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        // error = 'Failed to fetch data. Please try again.';
         // isLoading = false;
       });
     }
@@ -515,7 +557,6 @@ class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
                             selectedCity = '';
                             states.clear();
                             cities.clear();
-                            print("gbghbihfjvuhhuhgvbduhsi");
                             fetchStates(selectedCountry);
                           });
                         },
@@ -539,8 +580,7 @@ class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
                       SizedBox(height: 15.0),
                       // Add the state dropdown
                       DropdownButtonFormField<String>(
-                        value: selectedState.isNotEmpty &&
-                            states.contains(selectedState)
+                        value: selectedState.isNotEmpty && states.contains(selectedState)
                             ? selectedState
                             : null,
                         onChanged: (String? value) {
@@ -551,7 +591,9 @@ class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
                             fetchCities(selectedState);
                           });
                         },
-                        items: states.map((state) => DropdownMenuItem<String>(
+                        isExpanded: true, // This fixes the overflow issue
+                        items: states
+                            .map((state) => DropdownMenuItem<String>(
                           value: state,
                           child: Text(state),
                         ))
@@ -658,33 +700,33 @@ class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
                       //   ),
                       // ),
                       // SizedBox(height: 15.0),
-                      // DropdownButtonFormField<String>(
-                      //   value: genderController.text.isNotEmpty
-                      //       ? genderController.text
-                      //       : null,
-                      //   onChanged: (String? value) {
-                      //     setState(() {
-                      //       genderController.text = value!;
-                      //     });
-                      //   },
-                      //   items: ['Male', 'Female', 'Others'].map((String value) {
-                      //     return DropdownMenuItem<String>(
-                      //       value: value,
-                      //       child: Text(value),
-                      //     );
-                      //   }).toList(),
-                      //   decoration: InputDecoration(
-                      //     labelText: 'Select Gender',
-                      //     filled: true,
-                      //     fillColor: Colors.white,
-                      //     contentPadding: EdgeInsets.symmetric(
-                      //         vertical: 13.0, horizontal: 10.0),
-                      //     border: OutlineInputBorder(
-                      //       borderRadius: BorderRadius.circular(10.0),
-                      //     ),
-                      //   ),
-                      // ),
-                      // SizedBox(height: 15.0),
+                      DropdownButtonFormField<String>(
+                        value: genderController.text.isNotEmpty
+                            ? genderController.text
+                            : null,
+                        onChanged: (String? value) {
+                          setState(() {
+                            genderController.text = value!;
+                          });
+                        },
+                        items: ['Male', 'Female', 'Others'].map((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                        decoration: InputDecoration(
+                          labelText: 'Select Gender',
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: EdgeInsets.symmetric(
+                              vertical: 13.0, horizontal: 10.0),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 15.0),
                       DropdownButtonFormField<String>(
                         value: statusController.text.isNotEmpty
                             ? statusController.text
@@ -915,8 +957,8 @@ class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
         // professionController.text.isEmpty ||
         // qualificationController.text.isEmpty ||
         // ageGroupController.text.isEmpty ||
-        // genderController.text.isEmpty ||
-        coordinatorController.text.isEmpty ||
+        genderController.text.isEmpty ||
+        selectedCoordinator.isEmpty ||
         sourceController.text.isEmpty) {
       Utils.showAlertDialog(context, "Please fill in all fields");
       return;
@@ -1007,7 +1049,7 @@ class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
       // "qualification": qualificationController.text,
       // "age_group": ageGroupController.text,
       // "gender": genderController.text,
-      "cordinator": coordinatorController.text,
+      "cordinator": selectedCoordinator,
       "source": sourceController.text,
       "login_id": (await Utils.getStringFromPrefs(Constant.ROLL_ID)),
       "id": widget.employeeId.toString()
@@ -1117,12 +1159,8 @@ class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
     ];
     genderController.text = details['gender'].toString();
     genders = ['Male', 'Female', 'Others'];
-    coordinatorController.text = details['cordinator'].toString();
+    selectedCoordinator = details['cordinator'].toString();
     sourceController.text = details['source'].toString();
-   // selectedCountry =  details['country'].toString();
- //   selectedState =  details['state'].toString();
- //   selectedCity =  details['city'].toString();
-
 
     sources = [
       'Google',
@@ -1133,7 +1171,16 @@ class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
       'By a friend',
       'Others'
     ];
-   await  fetchCountries();
+    await  fetchCountries();
+    await fetchStates(details['country'].toString());
+    await fetchCities(details['state']);
+    // await fetchStates(details['state']);
+    // fetchMemberList();
+
+    Future.delayed(Duration(milliseconds: 1000), () {
+      // fetchStates("India");
+      fetchMemberList();
+    });
 
     setState(() {});
   }

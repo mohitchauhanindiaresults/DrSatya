@@ -69,6 +69,44 @@ class _UpdateMemberScreenState extends State<UpdateMemberScreen> {
     passsword.text = widget.password;
 
   }
+  // Future<void> fetchMemberList() async {
+  //   try {
+  //     // Replace 'YOUR_API_ENDPOINT' with the actual API endpoint
+  //     Response response = await Dio().get('https://clients.charumindworks.com/satya/api/cordinatorAddList');
+  //     Map<String, dynamic> responseData = response.data;
+  //     print( response.data);
+  //
+  //     if (responseData['status'] == 'false') {
+  //       List<dynamic> coordinatorList = responseData['cordinatorList'];
+  //       print(coordinatorList);
+  //       setState(() {
+  //         memberList = List<Map<String, dynamic>>.from(coordinatorList);
+  //         // filteredMemberList = memberList;
+  //         isLoading = false;
+  //
+  //         // Extracting names and adding them to a separate list
+  //         List<String> names = [];
+  //         for (var coordinator in coordinatorList) {
+  //           coordinators.add(coordinator['name']);
+  //         }
+  //
+  //         // Now 'names' contains the list of names from 'cordinatorList'
+  //         print(names);
+  //       });
+  //
+  //     } else {
+  //       setState(() {
+  //         error = 'Failed to fetch data. ${responseData['message']}';
+  //         isLoading = false;
+  //       });
+  //     }
+  //   } catch (e) {
+  //     setState(() {
+  //       error = 'Failed to fetch data. Please try again.';
+  //       isLoading = false;
+  //     });
+  //   }
+  // }
 
   List<String> selectedValues = [];
   @override

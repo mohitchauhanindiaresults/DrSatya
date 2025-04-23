@@ -17,7 +17,7 @@ class AddEnquiryScreen extends StatefulWidget {
 }
 
 class _AddEnquiryScreenState extends State<AddEnquiryScreen> {
-  TextEditingController centerController = TextEditingController();
+  TextEditingController centerController =TextEditingController();
   TextEditingController firstNameController = TextEditingController();
   TextEditingController lastNameController = TextEditingController();
   TextEditingController mobileController = TextEditingController();
@@ -256,18 +256,25 @@ class _AddEnquiryScreenState extends State<AddEnquiryScreen> {
         // professionController.text.isEmpty ||
         // qualificationController.text.isEmpty ||
         // ageGroupController.text.isEmpty ||
-        // genderController.text.isEmpty ||
+        genderController.text.isEmpty ||
 
         sourceController.text.isEmpty) {
       Utils.showAlertDialog(context, "Please fill in all fields");
       return;
     }
 
-    // Validate email format
-    if (!Utils.isEmailValid(emailController.text)) {
+    // // Validate email format
+    // if (!Utils.isEmailValid(emailController.text)) {
+    //   Utils.showAlertDialog(context, "Please enter a valid email!");
+    //   return;
+    // }
+
+    if (emailController.text.isNotEmpty &&
+        !Utils.isEmailValid(emailController.text)) {
       Utils.showAlertDialog(context, "Please enter a valid email!");
       return;
     }
+
 
     // Validate mobile numbers
     if (mobileController.text.length != 10) {
@@ -275,15 +282,15 @@ class _AddEnquiryScreenState extends State<AddEnquiryScreen> {
       return;
     }
 
-    if (alternativeMobileController.text.length != 10) {
-      Utils.showAlertDialog(context, "Enter a valid 10-digit alternative mobile number!");
-      return;
-    }
+    // if (alternativeMobileController.text.length != 10) {
+    //   Utils.showAlertDialog(context, "Enter a valid 10-digit alternative mobile number!");
+    //   return;
+    // }
 
-    if (mobileController.text == alternativeMobileController.text) {
-      Utils.showAlertDialog(context, "Mobile numbers cannot be the same!");
-      return;
-    }
+    // if (mobileController.text == alternativeMobileController.text) {
+    //   Utils.showAlertDialog(context, "Mobile numbers cannot be the same!");
+    //   return;
+    // }
 
     // Fetch stored data
     String? response = await Utils.getStringFromPrefs(Constant.MEMBER_API);
@@ -667,33 +674,33 @@ class _AddEnquiryScreenState extends State<AddEnquiryScreen> {
                       //   ),
                       // ),
                       // SizedBox(height: 15.0),
-                      // DropdownButtonFormField<String>(
-                      //   value: genderController.text.isNotEmpty
-                      //       ? genderController.text
-                      //       : null,
-                      //   onChanged: (String? value) {
-                      //     setState(() {
-                      //       genderController.text = value!;
-                      //     });
-                      //   },
-                      //   items: ['Male', 'Female', 'Others'].map((String value) {
-                      //     return DropdownMenuItem<String>(
-                      //       value: value,
-                      //       child: Text(value),
-                      //     );
-                      //   }).toList(),
-                      //   decoration: InputDecoration(
-                      //     labelText: 'Select Gender',
-                      //     filled: true,
-                      //     fillColor: Colors.white,
-                      //     contentPadding: EdgeInsets.symmetric(
-                      //         vertical: 13.0, horizontal: 10.0),
-                      //     border: OutlineInputBorder(
-                      //       borderRadius: BorderRadius.circular(10.0),
-                      //     ),
-                      //   ),
-                      // ),
-                      // SizedBox(height: 15.0),
+                      DropdownButtonFormField<String>(
+                        value: genderController.text.isNotEmpty
+                            ? genderController.text
+                            : null,
+                        onChanged: (String? value) {
+                          setState(() {
+                            genderController.text = value!;
+                          });
+                        },
+                        items: ['Male', 'Female', 'Others'].map((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                        decoration: InputDecoration(
+                          labelText: 'Select Gender',
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: EdgeInsets.symmetric(
+                              vertical: 13.0, horizontal: 10.0),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 15.0),
                       DropdownButtonFormField<String>(
                         value: statusController.text.isNotEmpty
                             ? statusController.text
