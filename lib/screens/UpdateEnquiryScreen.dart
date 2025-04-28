@@ -924,7 +924,7 @@ class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
             // 'profession': enquiry['profession'],
             // 'qualification': enquiry['qualification'],
             // 'age_group': enquiry['age_group'],
-            // 'gender': enquiry['gender'],
+            'gender': enquiry['gender'],
             'cordinator': enquiry['cordinator'],
             'source': enquiry['source'],
             'created_by': enquiry['created_by'],
@@ -952,7 +952,7 @@ class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
         firstNameController.text.isEmpty ||
         lastNameController.text.isEmpty ||
         mobileController.text.isEmpty ||
-        emailController.text.isEmpty ||
+        // emailController.text.isEmpty ||
         // addressController.text.isEmpty ||
         // professionController.text.isEmpty ||
         // qualificationController.text.isEmpty ||
@@ -965,26 +965,30 @@ class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
     }
 
     // Validate email format
-    if (!Utils.isEmailValid(emailController.text)) {
+    // if (!Utils.isEmailValid(emailController.text)) {
+    //   Utils.showAlertDialog(context, "Please enter a valid email!");
+    //   return;
+    // }
+    if (emailController.text.isNotEmpty &&
+        !Utils.isEmailValid(emailController.text)) {
       Utils.showAlertDialog(context, "Please enter a valid email!");
       return;
     }
-
     // Validate mobile numbers
     if (mobileController.text.length != 10) {
       Utils.showAlertDialog(context, "Enter a valid 10-digit mobile number!");
       return;
     }
 
-    if (alternativeMobileController.text.length != 10) {
-      Utils.showAlertDialog(context, "Enter a valid 10-digit alternative mobile number!");
-      return;
-    }
-
-    if (mobileController.text == alternativeMobileController.text) {
-      Utils.showAlertDialog(context, "Mobile numbers cannot be the same!");
-      return;
-    }
+    // if (alternativeMobileController.text.length != 10) {
+    //   Utils.showAlertDialog(context, "Enter a valid 10-digit alternative mobile number!");
+    //   return;
+    // }
+    //
+    // if (mobileController.text == alternativeMobileController.text) {
+    //   Utils.showAlertDialog(context, "Mobile numbers cannot be the same!");
+    //   return;
+    // }
 
     // Fetch stored data
     String? response = await Utils.getStringFromPrefs(Constant.MEMBER_API);
@@ -1048,7 +1052,7 @@ class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
       // "profession": professionController.text,
       // "qualification": qualificationController.text,
       // "age_group": ageGroupController.text,
-      // "gender": genderController.text,
+      "gender": genderController.text,
       "cordinator": selectedCoordinator,
       "source": sourceController.text,
       "login_id": (await Utils.getStringFromPrefs(Constant.ROLL_ID)),

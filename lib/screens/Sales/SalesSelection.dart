@@ -63,7 +63,7 @@ import 'package:satya_new/screens/Sales/SalesListing.dart';
         appBar: AppBar(
           backgroundColor: Color(0xFF14B3B4),
           title: Text(
-            'Create Lead',
+            'Sales',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
@@ -143,7 +143,7 @@ import 'package:satya_new/screens/Sales/SalesListing.dart';
                             crossAxisAlignment:
                             CrossAxisAlignment.start,
                             children: [
-                              Text('Center id: ${member['center_id']}'),
+                              Text('Sr No.: ${member['center_id']}'),
                               Text('Mobile: ${member['mobile']}'),
                             ],
                           ),

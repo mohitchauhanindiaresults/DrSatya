@@ -251,7 +251,7 @@ class _AddEnquiryScreenState extends State<AddEnquiryScreen> {
         firstNameController.text.isEmpty ||
         lastNameController.text.isEmpty ||
         mobileController.text.isEmpty ||
-        emailController.text.isEmpty ||
+        // emailController.text.isEmpty ||
         // addressController.text.isEmpty ||
         // professionController.text.isEmpty ||
         // qualificationController.text.isEmpty ||
@@ -301,10 +301,10 @@ class _AddEnquiryScreenState extends State<AddEnquiryScreen> {
       return;
     }
 
-    if (isMobileNumberFound(response, alternativeMobileController.text)) {
-      Utils.showAlertDialog(context, "Alternative number already found!");
-      return;
-    }
+    // if (isMobileNumberFound(response, alternativeMobileController.text)) {
+    //   Utils.showAlertDialog(context, "Alternative number already found!");
+    //   return;
+    // }
 
     // Proceed with adding enquiry
     addEnquiry(context);
@@ -897,7 +897,7 @@ class _AddEnquiryScreenState extends State<AddEnquiryScreen> {
       // "profession": professionController.text,
       // "qualification": qualificationController.text,
       // "age_group": ageGroupController.text,
-      // "gender": genderController.text,
+      "gender": genderController.text,
       "cordinator": selectedCoordinator,
       "source": sourceController.text,
       "login_id": (await Utils.getStringFromPrefs(Constant.ROLL_ID)),
