@@ -2,9 +2,12 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:satya_new/screens/Sales/SalesFollowup.dart';
+import 'package:satya_new/utils/Utils.dart';
 
 import '../../utils/ApiInterceptor.dart';
+import '../Yoga/AddNewFollowUpScreen.dart';
 
 class SalesListing extends StatefulWidget {
   @override
@@ -21,10 +24,41 @@ class _SalesListingState extends State<SalesListing> {
   @override
   void initState() {
     super.initState();
-
-    // Initialize the Future in initState
     employeeDetails = initiate();
   }
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+      builder: (BuildContext context, Widget? child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(textScaleFactor: 0.80), // Reduce overall scale
+          child: Theme(
+            data: Theme.of(context).copyWith(
+              datePickerTheme: DatePickerThemeData(
+                dayStyle: TextStyle(fontSize: 15),
+                weekdayStyle: TextStyle(fontSize: 11),
+                yearStyle: TextStyle(fontSize: 11),
+                headerHeadlineStyle: TextStyle(fontSize: 13),
+                headerHelpStyle: TextStyle(fontSize: 10),
+              ),
+            ),
+            child: child!,
+          ),
+        );
+      },
+    );
+
+    if (picked != null) {
+      setState(() {
+        var _dateController = DateFormat('yyyy-MM-dd').format(picked);
+      });
+    }
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +74,14 @@ class _SalesListingState extends State<SalesListing> {
             color: Colors.white,
           ),
         ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.calendar_today),
+            onPressed: () {
+              _selectDate(context);
+            },
+          ),
+        ],
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -51,102 +93,119 @@ class _SalesListingState extends State<SalesListing> {
         ),
         child: Column(
           children: [
-            Row(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  ' Status',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1,
-                    color: Colors.white,
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Row(
+                    children: const [
+                      // Expanded(
+                      //   flex: 1,
+                      //   child: Text(
+                      //     'Status',
+                      //     style: TextStyle(
+                      //       fontSize: 16,
+                      //       fontWeight: FontWeight.bold,
+                      //       letterSpacing: 1,
+                      //       color: Colors.white,
+                      //     ),
+                      //   ),
+                      // ),
+                      // Expanded(
+                      //   flex: 1,
+                      //   child: Text(
+                      //     'Potentiality',
+                      //     style: TextStyle(
+                      //       fontSize: 16,
+                      //       fontWeight: FontWeight.bold,
+                      //       letterSpacing: 1,
+                      //       color: Colors.white,
+                      //     ),
+                      //   ),
+                      // ),
+                      // Expanded(
+                      //   flex: 1,
+                      //   child: Text(
+                      //     'Source',
+                      //     style: TextStyle(
+                      //       fontSize: 16,
+                      //       fontWeight: FontWeight.bold,
+                      //       letterSpacing: 1,
+                      //       color: Colors.white,
+                      //     ),
+                      //   ),
+                      // ),
+                    ],
                   ),
                 ),
-                Text(
-                  'Potentiality     ',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1,
-                    color: Colors.white,
-                  ),
+                SizedBox(height: 8.0),
+                Row(
+                  children: [
+                    Expanded(
+                      flex: 1,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10.0), // Padding Left & Right
+                        child: DropdownButtonFormField<String>(
+                          value: selectedStatus.isNotEmpty ? selectedStatus : null,
+                          isExpanded: true,
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                            filled: true,
+                            fillColor: Colors.white,
+                          ),
+                          hint: Text('Select Status',style: TextStyle(fontSize: 12)),
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              selectedStatus = newValue ?? '';
+                            });
+                          },
+                          items: <String>['', 'New enquiry', 'Old enquiry', 'Current member', 'Old member']
+                              .map((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value.isNotEmpty ? value : 'Select Status',style: TextStyle(fontSize: 12)),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10.0), // Padding Left & Right
+                        child: DropdownButtonFormField<String>(
+                          value: selectedPotentiality.isNotEmpty ? selectedPotentiality : null,
+                          isExpanded: true,
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                            filled: true,
+                            fillColor: Colors.white,
+                          ),
+                          hint: Text('Potentiality',style: TextStyle(fontSize: 12)),
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              selectedPotentiality = newValue ?? '';
+                            });
+                          },
+                          items: <String>['', 'Super Hot', 'Hot', 'Warm', 'Cold']
+                              .map((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value.isNotEmpty ? value : 'Select Potentiality',style: TextStyle(fontSize: 12)),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                Text(
-                  'Source',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1,
-                    color: Colors.white,
-                  ),
-                ),
+
               ],
             ),
 
-            Row(
-              children: [
-                Expanded(
-                  flex: 1, // Ensures it takes up available space
-                  child: DropdownButton<String>(
-                    value: selectedStatus,
-                    isExpanded: true, // Ensures it doesn't overflow
-                    hint: Text('Select a status'),
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        selectedStatus = newValue ?? '';
-                      });
-                    },
-                    items: <String>['', 'New enquiry', 'Old enquiry', 'Current member', 'Old member']
-                        .map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                  ),
-                ),
-                Expanded(
-                  flex: 1,
-                  child: DropdownButton<String>(
-                    value: selectedPotentiality,
-                    isExpanded: true, // Ensures it doesn't overflow
-
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        selectedPotentiality = newValue ?? '';
-                      });
-                    },
-                    items: <String>['', 'Super Hot', 'Hot', 'Warm', 'Cold']
-                        .map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                  ),
-                ),
-                Expanded(
-                  flex: 1,
-                  child: DropdownButton<String>(
-                    value: selectedSource,
-                    isExpanded: true, // Ensures it doesn't overflow
-
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        selectedSource = newValue ?? '';
-                      });
-                    },
-                    items: <String>['', 'FaceBook', 'Instagram', 'others']
-                        .map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ],
-            ),
 
             Expanded(
               child: FutureBuilder<Map<String, dynamic>>(
@@ -181,28 +240,179 @@ class _SalesListingState extends State<SalesListing> {
                       itemBuilder: (context, index) {
                         Map<String, dynamic> sale = salesList[index];
 
-                        return Column(
-                          children: [
-                            ListTile(
-                              title: Column(
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          child: Card(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: 4,
+                            child: Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  _buildText('Center', sale['center'].toString()),
-                                  _buildText('Name', sale['name']),
-                                  _buildText('Mobile', sale['mobile']),
-                                  _buildText('Alternative', sale['alternative']),
-                                  _buildText('Program', sale['program']),
-                                  _buildText('Sub-program', sale['sub-program']),
-                                  _buildText('Initial Remark', sale['intial_remark']),
-                                  _buildText('Total Sale', sale['total_sale'].toString()),
-                                  _buildText('Potentiality', sale['potentiality']),
-                                  _buildText('Source', sale['source']),
-                                  _buildText('Assigned To', sale['assigned_to']),
-                                  _buildText('Status', sale['status']),
-                                  _buildText('Coordinator', sale['cordinator']),
-                                  _buildText('Final Remark', sale['final_remark']),
+                                  // Name + Mobile Row
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        sale['name'],
+                                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                      ),
+                                      Text(
+                                        sale['mobile'],
+                                        style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 8),
 
-                                  // Follow Up Button
+                                  // Program + Subprogram
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          "Program: ${sale['program']}",
+                                          style: TextStyle(fontSize: 12),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Text(
+                                          "Sub Program: ${sale['sub_program']}",
+                                          style: TextStyle(fontSize: 12),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 8),
+
+                                  // Potentiality + Source
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: RichText(
+                                          text: TextSpan(
+                                            text: "Potentiality: ",
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.black, // Static part color
+                                            ),
+                                            children: [
+                                              TextSpan(
+                                                text: sale['potentiality'] ?? '',
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.bold,
+                                                  color:Utils.getPotentialityColor(sale['potentiality']),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+
+                                      ),
+                                      Expanded(
+                                        child: Text(
+                                          "Source: ${sale['source']}",
+                                          style: TextStyle(fontSize: 12),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 8),
+
+                                  // Center and Status
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          "Center: ${sale['center']}",
+                                          style: TextStyle(fontSize: 12),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Text(
+                                          "Status: ${sale['status']}",
+                                          style: TextStyle(fontSize: 12),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 8),
+
+                                  // Assigned To and Coordinator
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          "Assigned: ${sale['assigneduser']['name']}",
+                                          style: TextStyle(fontSize: 12),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Text(
+                                          "Coordinator: ${sale['cordinator']['name']}",
+                                          style: TextStyle(fontSize: 12),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 10),
+                                  Divider(),
+                                  // Assigned To and Coordinator
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: RichText(
+                                          text: TextSpan(
+                                            text: 'Lead Status: ',
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.black, // Static text color
+                                            ),
+                                            children: [
+                                              TextSpan(
+                                                text: sale['followinfo']['status'] ?? '',
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  color: Utils.getLeadStatusColor(sale['followinfo']['status']),
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      sale['followinfo']['action_status'] != null
+                                          ? Expanded(
+                                        child: Text(
+                                          "Action: ${sale['followinfo']['action_status']}",
+                                          style: TextStyle(fontSize: 12),
+                                        ),
+                                      ) : SizedBox.shrink(),
+                                    ],
+                                  ),
+                                  SizedBox(height: 8),
+                                  sale['followinfo']['initial_datetime'] != null
+                                      ? Text(
+                                    "Initial Date: ${sale['followinfo']['initial_datetime']}",
+                                    style: TextStyle(fontSize: 12),
+                                  )
+                                      : SizedBox.shrink(),
+                                  SizedBox(height: 8),
+                                   Text(
+                                    "Follow Up Date: ${sale['followinfo']['date']}  ${sale['followinfo']['time']}",
+                                    style: TextStyle(fontSize: 12),
+                                  ),
+                                  SizedBox(height: 8),
+                                  Text(
+                                    "Remark: ${sale['followinfo']['remark']}",
+                                    style: TextStyle(fontSize: 12),
+                                  ),
+                                  SizedBox(height: 12),
+
+                                  // Follow-up Button
                                   Align(
                                     alignment: Alignment.centerRight,
                                     child: ElevatedButton(
@@ -210,23 +420,27 @@ class _SalesListingState extends State<SalesListing> {
                                         onFollowUpPressed(sale);
                                       },
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.orange, // Button color
+                                        backgroundColor: Colors.orange,
+                                        minimumSize: Size(80, 32), // Smaller width and height
+                                        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8), // Internal padding smaller
                                         shape: RoundedRectangleBorder(
                                           borderRadius: BorderRadius.circular(8),
                                         ),
                                       ),
-                                      child: Text('Follow Up'),
+                                      child: Text(
+                                        'Follow Up',
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          color: Colors.white,
+                                        ),
+                                      ),
                                     ),
                                   ),
+
                                 ],
                               ),
-                              onTap: () {
-                                // Handle item click
-                                print("Tapped on ${sale['name']}");
-                              },
                             ),
-                            Divider(),
-                          ],
+                          ),
                         );
                       },
                     );
@@ -260,7 +474,7 @@ class _SalesListingState extends State<SalesListing> {
 
   void onFollowUpPressed(Map<String, dynamic> sale) {
     print('Follow-up clicked for ${sale['name']}');
-    Navigator.push(context, MaterialPageRoute(builder: (context) => SalesFollowup(employeeId: 3,)));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => AddNewFollowUpScreen(salesId: sale['id'].toString(),centerId: sale['center_id'].toString())));
   }
 
   Future<Map<String, dynamic>> initiate() async {

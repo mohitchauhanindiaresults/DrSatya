@@ -17,6 +17,7 @@ class Constant {
   static const String FETCH_STATES = 'fetch-state';
   static const String FETCH_CITY = 'fetch-city';
   static const String FETCH_SUBPROGRAM = 'subProgramFetchList';
+  static const String UPDATE_FOLLOW_UP = 'update-followup-status';
 
 
 

@@ -62,7 +62,11 @@ class _AddSaleFormState extends State<AddSaleForm> {
   List<int> coordinatorsId = [];
   String selectedCoordinatorId = "";
   List<String> programList = [];
+  List<int> programId = [];
+  String selectedProgramId ='';
+  String selectedSubProgramId ='';
   List<String> subprogramList = [];
+  List<String> subprogramId = [];
   List<String> states = [];
   List<String> cities = [];
   final Dio _dio = ApiInterceptor.createDio(); // Use ApiInterceptor to create Dio instance
@@ -120,14 +124,12 @@ class _AddSaleFormState extends State<AddSaleForm> {
   Future<void> fetchProgramLis() async {
     try {
       // Replace 'YOUR_API_ENDPOINT' with the actual API endpoint
-      Response response = await _dio.get('https://clients.charumindworks.com/satya/api/programSubprogramAddList');
+      Response response = await _dio.get('http://clients.charumindworks.com/satya/api/programSubprogramAddList');
       Map<String, dynamic> responseData = response.data;
       print("fdfgdfhferdgfefgfgfef"+response.toString());
       apiResponse = response.toString();
 
      //  Utils.saveStringToPrefs(Constant.PROGRAM_API, response.data);
-
-
       if (responseData['status'] == 'false') {
         List<dynamic> coordinatorList = responseData['programList'];
         print(coordinatorList);
@@ -142,11 +144,10 @@ class _AddSaleFormState extends State<AddSaleForm> {
           for (var coordinator in coordinatorList) {
             if (coordinator['parent_id'] == null) {
               programList.add(coordinator['name']);
+              programId.add(coordinator['id']);
             }
           }
-
-          // Now 'names' contains the list of names from 'cordinatorList'
-          print("hgcgguvgvhh"+names.toString());
+          print("hgcggddfsdfuvgvhh"+programId.toString());
         });
 
 
@@ -180,22 +181,22 @@ class _AddSaleFormState extends State<AddSaleForm> {
             color: Colors.white,
           ),
         ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.access_time),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        SalesFollowup(employeeId: int.parse(centerController.text))
-                ),
-              );
-              // Add your settings button functionality here
-            },
-          ),
-
-        ],
+        // actions: [
+        //   IconButton(
+        //     icon: Icon(Icons.access_time),
+        //     onPressed: () {
+        //       // Navigator.push(
+        //       //   context,
+        //       //   MaterialPageRoute(
+        //       //       builder: (context) =>
+        //       //           SalesFollowup(employeeId: int.parse(centerController.text))
+        //       //   ),
+        //       // );
+        //       // Add your settings button functionality here
+        //     },
+        //   ),
+        //
+        // ],
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -309,59 +310,75 @@ class _AddSaleFormState extends State<AddSaleForm> {
                       ),
                       SizedBox(height: 15.0),
                       DropdownButtonFormField<String>(
-                        value: programString.isNotEmpty &&
-                            programList.contains(programString)
+                        value: programString.isNotEmpty && programList.contains(programString)
                             ? programString
                             : null,
                         onChanged: (String? value) {
-                          setState(() {
-                            programString = value ?? '';
-                          subprogramList=  getNamesWithParentId(apiResponse, getIdFromName(apiResponse, programString));
-                          setState(() {
-
-                          });
-                            print("gbghbihfjvuhhuhgvbduhsi");
-                          });
+                          if (value != null) {
+                            setState(() {
+                              programString = value;
+                              // Update subprogramList based on selected program
+                              subprogramList = getNamesWithParentId(apiResponse, getIdFromName(apiResponse, programString));
+                              // Update selectedProgramId
+                              int selectedIndex = programList.indexOf(programString);
+                              if (selectedIndex != -1 && selectedIndex < programId.length) {
+                                selectedProgramId = programId[selectedIndex].toString();
+                                print("fdfdfd"+selectedProgramId.toString());
+                              } else {
+                                selectedProgramId = '';
+                              }
+                              // Also reset subprogram selection when program changes
+                              subprogramString = '';
+                              selectedSubProgramId = '';
+                            });
+                          }
                         },
-                        items: programList.map((country) => DropdownMenuItem<String>(value: country,
-                          child: Text(country),
-                        ))
-                            .toList(),
+                        items: programList.map((program) => DropdownMenuItem<String>(
+                          value: program,
+                          child: Text(program),
+                        )).toList(),
                         decoration: InputDecoration(
                           labelText: 'Select Program',
                           filled: true,
                           fillColor: Colors.white,
-                          contentPadding: EdgeInsets.symmetric(
-                              vertical: 13.0, horizontal: 10.0),
+                          contentPadding: EdgeInsets.symmetric(vertical: 13.0, horizontal: 10.0),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10.0),
                           ),
                         ),
                       ),
+
                       SizedBox(height: 15.0),
+
                       DropdownButtonFormField<String>(
-                        value: subprogramString.isNotEmpty &&
-                            subprogramList.contains(subprogramString)
+                        value: subprogramString.isNotEmpty && subprogramList.contains(subprogramString)
                             ? subprogramString
                             : null,
                         onChanged: (String? value) {
-                          setState(() {
-                            subprogramString = value ?? '';
-                            print("gbghbihfjvuhhuhgvbduhsi");
-                          });
+                          if (value != null) {
+                            setState(() {
+                              subprogramString = value;
+
+                              // Update selectedSubProgramId
+                              // int selectedIndex = subprogramList.indexOf(subprogramString);
+                              // if (selectedIndex != -1 && selectedIndex < subprogramId.length) {
+                                selectedSubProgramId = getIdFromName(apiResponse, subprogramString).toString();
+                                print("object"+selectedSubProgramId.toString());
+                              // } else {
+                              //   selectedSubProgramId = '';
+                              // }
+                            });
+                          }
                         },
-                        items: subprogramList
-                            .map((country) => DropdownMenuItem<String>(
-                          value: country,
-                          child: Text(country),
-                        ))
-                            .toList(),
+                        items: subprogramList.map((subProgram) => DropdownMenuItem<String>(
+                          value: subProgram,
+                          child: Text(subProgram),
+                        )).toList(),
                         decoration: InputDecoration(
                           labelText: 'Select Sub-Program',
                           filled: true,
                           fillColor: Colors.white,
-                          contentPadding: EdgeInsets.symmetric(
-                              vertical: 13.0, horizontal: 10.0),
+                          contentPadding: EdgeInsets.symmetric(vertical: 13.0, horizontal: 10.0),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10.0),
                           ),
@@ -879,6 +896,7 @@ class _AddSaleFormState extends State<AddSaleForm> {
         names.add(item['name']);
       }
     }
+
     return names;
   }
 
@@ -957,6 +975,8 @@ class _AddSaleFormState extends State<AddSaleForm> {
                 "lead_no": leadIdController.text.toString().trim(),
                 "program": programString,
                 "sub_program": subprogramString,
+                "program_id": selectedProgramId.toString(),
+                "sub_program_id": selectedSubProgramId.toString(),
                 "intial_remark": intial_remark.text,
                 "total_sale":"800",
                 "potentiality": Potentiality.text,

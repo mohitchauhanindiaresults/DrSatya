@@ -1,9 +1,11 @@
   import 'package:dio/dio.dart';
   import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
   import 'package:satya_new/screens/Sales/AddSaleForm.dart';
 import 'package:satya_new/screens/Sales/SalesListing.dart';
   import 'package:satya_new/screens/Sales/SalesSetting.dart';
-  import '../../utils/Constant.dart';
+  import '../../utils/ApiInterceptor.dart';
+import '../../utils/Constant.dart';
   import '../../utils/Utils.dart';
   import '../AddEnquiryScreen.dart';
   import '../UpdateEnquiryScreen.dart';
@@ -18,6 +20,7 @@ import 'package:satya_new/screens/Sales/SalesListing.dart';
     List<Map<String, dynamic>> filteredMemberList = [];
     bool isLoading = true;
     String error = '';
+    final Dio _dio = ApiInterceptor.createDio(); // Use ApiInterceptor to create Dio instance
 
     @override
     void initState() {
@@ -27,8 +30,7 @@ import 'package:satya_new/screens/Sales/SalesListing.dart';
 
     Future<void> fetchMemberList() async {
       try {
-        final Dio dio = Dio();
-        final response = await dio.get(
+        final response = await _dio.get(
           "https://clients.charumindworks.com/satya/api/enquiry",
         );
 
@@ -36,10 +38,16 @@ import 'package:satya_new/screens/Sales/SalesListing.dart';
           final jsonResponse = response.data;
           Utils.printLongString(jsonResponse.toString());
           Utils.saveStringToPrefs(Constant.MEMBER_API, response.toString());
-          final data = jsonResponse['enquiry'];
+          // final data = jsonResponse['enquiry'];
+          //  Filter out enquiries where followup_status is 'Closed'
+          final List<dynamic> allEnquiries = jsonResponse['enquiry'] ?? [];
+          final List<dynamic> filteredEnquiries = allEnquiries.where((e) {
+            final status = e['followup_status']?.toString().toLowerCase();
+            return status != 'closed';
+          }).toList();
 
           setState(() {
-            memberList = List<Map<String, dynamic>>.from(data);
+            memberList = List<Map<String, dynamic>>.from(filteredEnquiries);
             filteredMemberList = List.from(memberList); // Initialize filtered list
             isLoading = false;
           });
@@ -123,15 +131,12 @@ import 'package:satya_new/screens/Sales/SalesListing.dart';
                         elevation: 5,
                         child: ListTile(
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    AddSaleForm(
-                                      employeeId: member['id'],
-                                    ),
-                              ),
-                            );
+                            if(member['followup_status']!='Pending')
+                            {
+                              Fluttertoast.showToast(msg:"You have already running active lead", toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, backgroundColor: Colors.grey, textColor: Colors.white);
+                              return;
+                            }
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => AddSaleForm(employeeId: member['id'])));
                           },
                           title: Text(
                             member['first_name'],
@@ -144,6 +149,23 @@ import 'package:satya_new/screens/Sales/SalesListing.dart';
                             CrossAxisAlignment.start,
                             children: [
                               Text('Sr No.: ${member['center_id']}'),
+                              RichText(
+                                text: TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: 'Lead Status: ', // Regular text
+                                      style: TextStyle(color: Colors.black), // Color for regular text
+                                    ),
+                                    TextSpan(
+                                      text: '${member['followup_status'] ?? ''}',
+                                      style: TextStyle(
+                                        color: Utils.getLeadStatusColor(member['followup_status']),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+
                               Text('Mobile: ${member['mobile']}'),
                             ],
                           ),
