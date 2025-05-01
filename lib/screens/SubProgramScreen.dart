@@ -28,7 +28,6 @@ class _SubProgramScreenState extends State<SubProgramScreen> {
   @override
   void initState() {
     super.initState();
-
     fetchProgramList();
   }
 
@@ -99,7 +98,7 @@ class _SubProgramScreenState extends State<SubProgramScreen> {
 
           Center(
             child: Text(
-              'SubPrograms',
+              'Sub Programs',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -118,7 +117,7 @@ class _SubProgramScreenState extends State<SubProgramScreen> {
                   child: TextField(
                     controller: coordinatorControllerp,
                     decoration: InputDecoration(
-                      hintText: 'Fill SubProgram',
+                      hintText: 'Add Sub Program',
                     ),
                     onChanged: (query) {
                       filterMemberListp(query);

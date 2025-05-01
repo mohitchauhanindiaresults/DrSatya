@@ -1,0 +1,2 @@
+/Users/shailendrachaturvedi/AndroidStudioProjects/DrSatya/android/app/.cxx/RelWithDebInfo/5959r393/x86/CMakeFiles/edit_cache.dir
+/Users/shailendrachaturvedi/AndroidStudioProjects/DrSatya/android/app/.cxx/RelWithDebInfo/5959r393/x86/CMakeFiles/rebuild_cache.dir

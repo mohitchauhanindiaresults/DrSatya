@@ -340,7 +340,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
      //   addIfValid("18", "Customer Care");
      //   addIfValid("19", "Trainings");
         addIfValid("20", "Reports");
-        addIfValid("21", "Follow-up");
+        addIfValid("21", "Store");
 
         setState(() {});
         print(buttonLabels);

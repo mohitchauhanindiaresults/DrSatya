@@ -269,6 +269,37 @@ class Utils {
 
     return buffer.toString();
   }
+ static Color getPotentialityColor(String? potentiality) {
+    switch (potentiality?.toLowerCase()) {
+      case 'warm':
+        return Colors.green;
+      case 'cold':
+        return Colors.blue;
+      case 'hot':
+        return Colors.red;
+      case 'super hot':
+        return Color(0xFF8B0000); // Dark Red color
+      default:
+        return Colors.black; // Default if no match
+    }
+  }
+  static Color? getLeadStatusColor(String? status) {
+    print("Status received: ${status.toString()}");
+    switch (status?.toLowerCase().trim()) {
+      case 'active':
+        return Colors.green;
+      case 'pending':
+        return Colors.blue;
+      case 'closed':
+        return Colors.red;
+        case 'waiting approval':
+        return Colors.yellowAccent[700];
+      case 'approved':
+        return Color(0xFF8B0000); // Dark Red
+      default:
+        return Colors.black; // Default if no match
+    }
+  }
 
 // ... Add more methods for different data types as needed
 }

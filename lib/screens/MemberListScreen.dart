@@ -139,6 +139,8 @@ class _MemberListScreenState extends State<MemberListScreen> {
                               builder: (context) =>
                                   UpdateEnquiryScreen(
                                     employeeId: member['id'],
+                                    centerId: member['center_id'],
+
                                   ),
                             ),
                           );
@@ -153,7 +155,7 @@ class _MemberListScreenState extends State<MemberListScreen> {
                           crossAxisAlignment:
                           CrossAxisAlignment.start,
                           children: [
-                            Text('Center Id: ${member['center_id']}'),
+                            Text('Sr No: ${member['center_id']}'),
                             Text('Mobile: ${member['mobile']}'),
                           ],
                         ),

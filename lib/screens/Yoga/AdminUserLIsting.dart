@@ -1,8 +1,7 @@
-import 'dart:convert';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:satya_new/screens/Sales/SalesFollowup.dart';
+import 'package:satya_new/screens/Yoga/AdminUserInactiveListing.dart';
+import 'package:satya_new/screens/Yoga/UpdateMemberScreen.dart';
 
 import '../../utils/ApiInterceptor.dart';
 
@@ -19,6 +18,7 @@ class _AdminUserLIstingState extends State<AdminUserLIsting> {
   List<Map<String, dynamic>> _filteredUsers = [];
   List<Map<String, dynamic>> _allUsers = [];
   bool _isSearching = false;
+  String roles = '';
 
   @override
   void initState() {
@@ -39,7 +39,7 @@ class _AdminUserLIstingState extends State<AdminUserLIsting> {
       appBar: AppBar(
         backgroundColor: Color(0xFF14B3B4),
         title: Text(
-          'All Leads',
+          'Active Coordinators',
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
@@ -48,21 +48,24 @@ class _AdminUserLIstingState extends State<AdminUserLIsting> {
         ),
         actions: [
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: EdgeInsets.only(right: 12.0),
             child: Container(
-              width: 250,
-              child: TextField(
-                controller: _searchController,
-                decoration: InputDecoration(
-                  hintText: 'Search by name or number',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: Colors.white),
-                  ),
-                  filled: true,
-                  fillColor: Colors.white,
-                  contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
-                ),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.red,),
+                shape: BoxShape.circle, // use BoxShape.rectangle for rounded square
+                color: Colors.white, // background color inside the border
+              ),
+              child: IconButton(
+                icon: Icon(Icons.group_off, color: Colors.red),
+                tooltip: 'Show Inactive Members',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AdminUserInactiveLIsting(), // Replace accordingly
+                    ),
+                  );
+                },
               ),
             ),
           ),
@@ -78,6 +81,25 @@ class _AdminUserLIstingState extends State<AdminUserLIsting> {
         ),
         child: Column(
           children: [
+
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 18.0),
+              child: Container(
+                child: TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    hintText: 'Search by name or number',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(color: Colors.white),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                    contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
+                  ),
+                ),
+              ),
+            ),
             Expanded(
               child: FutureBuilder<List<Map<String, dynamic>>>(
                 future: userDetails,
@@ -121,21 +143,25 @@ class _AdminUserLIstingState extends State<AdminUserLIsting> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   SizedBox(height: 4),
-                                  Text('Email: ${user['email']}',
-                                      style: TextStyle(fontSize: 12, color: Colors.grey[600])),
-                                  SizedBox(height: 4),
+                                  // Text('Email: ${user['email']}',
+                                  //     style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                                  // SizedBox(height: 4),
                                   Text('Mobile: ${user['mobile']}',
                                       style: TextStyle(fontSize: 12, color: Colors.grey[600])),
                                   SizedBox(height: 4),
                                   Text('Password: ${user['password_text']}',
                                       style: TextStyle(fontSize: 12, color: Colors.grey[600])),
                                   SizedBox(height: 4),
-                                  Text('Designation: ${user['designation'].join(', ')}',
+                                  Text('Roles: ${user['designation_name'].join(', ')}',
                                       style: TextStyle(fontSize: 12, color: Colors.grey[600])),
                                 ],
                               ),
                               onTap: () {
                                 print('Tapped on ${user['name']}');
+                                print('Tapped on ${user['email']}');
+                                print('Tapped on ${user['mobile']}');
+                                print('Tapped on ${user['status']}');
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => UpdateMemberScreen(name:user['name'],email: user['email'],roles:(user['designation_name'] as List).map((e) => e.toString()).toList(),mobile: user['mobile'],id:user['id'].toString(),password:user['password_text'].toString(),status:user['status'].toString())));
                               },
                             ),
                           ),
@@ -154,7 +180,6 @@ class _AdminUserLIstingState extends State<AdminUserLIsting> {
 
   Future<List<Map<String, dynamic>>> fetchUserDetails() async {
     const userApiEndpoint = 'https://clients.charumindworks.com/satya/api/getAllUsersList';
-
     try {
       final response = await _dio.get(userApiEndpoint);
 
@@ -163,11 +188,12 @@ class _AdminUserLIstingState extends State<AdminUserLIsting> {
         'name': user['name'],
         'email': user['email'],
         'mobile': user['mobile'],
-        'designation': user['designation'],
+        'designation_name': user['designation_name'],
         'password_text': user['password_text'],
-      })
-          .toList();
+        'id': user['id'],
+        'status': user['status'],
 
+      }).toList();
       setState(() {
         _allUsers = users;
         _filteredUsers = [];

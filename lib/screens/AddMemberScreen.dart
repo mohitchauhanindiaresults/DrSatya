@@ -32,7 +32,7 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
     {"id": "7", "label": "Yoga"},
     {"id": "16", "label": "Accounts"},
     {"id": "20", "label": "Reports"},
-    {"id": "21", "label": "Follow-up"},
+    {"id": "21", "label": "Store"},
   ];
   List<String> selectedValues = [];
   @override
@@ -186,9 +186,10 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
                     // For example, you can print the values for now
 
                   if (nameController.text.isEmpty) {
-                      Utils.showAlertDialog(
-                          context, "Name field cannot be empty");
-                    } else if (mobileController.text.isEmpty) {
+                      Utils.showAlertDialog(context, "Name field cannot be empty");
+                    }else if (selectedValues.isEmpty) {
+                    Utils.showAlertDialog(context, "Please select atleast one role");}
+                  else if (mobileController.text.isEmpty) {
                       Utils.showAlertDialog(context, "Mobile field cannot be empty");
                     } else if (mobileController.text.length != 10 || !RegExp(r'^[0-9]+$').hasMatch(mobileController.text)) {
                       Utils.showAlertDialog(context, "Mobile number should be 10 digits");
@@ -214,7 +215,7 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
                         EdgeInsets.symmetric(vertical: 10.0, horizontal: 40.0),
                   ),
                   child: Text(
-                    'Add Member',
+                    'Add Coordinator',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -231,6 +232,7 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
   }
 
   Future<void> addMember(BuildContext context) async {
+    print("object"+selectedValues.join(","));
     ProgressDialog pd = ProgressDialog(context: context);
     pd.show(msg: "Please Wait");
     // String role="";
@@ -280,8 +282,9 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
       "role": "9",
       "password": passsword.text,
     };
-    print(data);
+    print("hjjhk"+data.toString());
     String error = "";
+
     try {
       final response = await dio.post(Constant.BASE_URL + "api/adduser", data: data);
 
@@ -324,6 +327,7 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
         }
       }else if(response.statusCode == 422){
         Utils.showAlertDialog(context, "Number already exist");
+        print('Error: ${response.data}');
       } else {
         pd.close(delay: 0);
         Fluttertoast.showToast(

@@ -13,8 +13,9 @@ import 'DashboardScreen.dart';
 
 class UpdateEnquiryScreen extends StatefulWidget {
   final int employeeId;
+  final String centerId;
 
-  UpdateEnquiryScreen({required this.employeeId});
+  UpdateEnquiryScreen({required this.employeeId,required this.centerId});
 
   @override
   _UpdateEnquiryScreenState createState() => _UpdateEnquiryScreenState();
@@ -67,6 +68,8 @@ class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
   List<String> countries = [];
   List<String> states = [];
   List<String> cities = [];
+  List<String> centerList = [];
+  List<Map<String, dynamic>> memberList = [];
 
   String countryJson = '';
   String statesJson = '';
@@ -76,6 +79,8 @@ class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
   String selectedState = '';
   String selectedCity = '';
   String apiToken = ""; // Variable to store the obtained API token
+  String selectedCoordinator = '';
+  List<String> coordinators = [];
 
 //   Future<void> getAccessToken() async {
 //     final response = await http.get(
@@ -172,9 +177,11 @@ class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
         countryJson = response.toString();
         final List<dynamic> data = response.data['country'];
         Set<String> uniqueCountries = data.map((e) => e['name'].toString()).toSet();
-
+        print("object"+uniqueCountries.toString());
         setState(() {
           countries = uniqueCountries.toList();
+          print("object"+countries.toString());
+
         });
       } else {
         throw Exception('Failed to load countries');
@@ -207,11 +214,11 @@ class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
   }
 
   Future<void> fetchCities(String state) async {
-    print("chut786");
+    print("");
 
     print(statesJson);
     print(state);
-    print("land786");
+    print("");
 
     print(Utils.getIdBySubNameState(statesJson, state));
     try {
@@ -242,7 +249,7 @@ class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
   void initState() {
     super.initState();
     centerController.text = Utils.generateTimestampInMilliseconds();
-
+     fetchCenters();
     // Set initial values for dropdowns
     if (countries.isNotEmpty) {
       selectedCountry = countries.first;
@@ -257,6 +264,74 @@ class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
     }
     initaite();
   }
+  Future<void> fetchCenters() async {
+    const url = 'https://clients.charumindworks.com/satya/api/get-all-centers';
+    try {
+      final response = await _dio.get(url);
+      if (response.statusCode == 200) {
+        // final List<dynamic> data = response.data['centers'] ?? [];
+        List data = response.data['centers'];
+
+        setState(() {
+          // filteredCenterList = data.cast<Map<String, dynamic>>();
+          // centerList = List<String>.from(response.data);
+          centerList = data.map<String>((item) => item['name'].toString()).toList();
+          // centerController.text=response.data['enquiry_next_generate'];
+          // isLoading = false;
+          // error = "";
+        });
+      } else {
+        setState(() {
+          // error = "Failed to load centers";
+          // isLoading = false;
+        });
+      }
+    } catch (e) {
+      print("Error fetching centers: $e");
+      setState(() {
+        // error = "Something went wrong";
+        // isLoading = false;
+      });
+    }
+  }
+  Future<void> fetchMemberList() async {
+    try {
+      // Replace 'YOUR_API_ENDPOINT' with the actual API endpoint
+      Response response = await Dio().get('https://clients.charumindworks.com/satya/api/cordinatorAddList');
+      Map<String, dynamic> responseData = response.data;
+      print( response.data);
+
+      if (responseData['status'] == 'false') {
+        List<dynamic> coordinatorList = responseData['cordinatorList'];
+        print(coordinatorList);
+        setState(() {
+          memberList = List<Map<String, dynamic>>.from(coordinatorList);
+          // filteredMemberList = memberList;
+          // isLoading = false;
+
+          // Extracting names and adding them to a separate list
+          List<String> names = [];
+          for (var coordinator in coordinatorList) {
+            coordinators.add(coordinator['name']);
+          }
+
+          // Now 'names' contains the list of names from 'cordinatorList'
+          print(names);
+        });
+
+      } else {
+        setState(() {
+          // error = 'Failed to fetch data. ${responseData['message']}';
+          // isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        // error = 'Failed to fetch data. Please try again.';
+        // isLoading = false;
+      });
+    }
+  }
 
 
   @override
@@ -265,7 +340,7 @@ class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
       appBar: AppBar(
         backgroundColor: Color(0xFF14B3B4),
         title: Text(
-          'Update Enquiry',
+          'Update Data',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -297,96 +372,7 @@ class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
                         controller: centerController,
                         enabled: false,
                         decoration: InputDecoration(
-                          labelText: 'Id No',
-                          filled: true,
-                          fillColor: Colors.white,
-                          contentPadding: EdgeInsets.symmetric(
-                              vertical: 13.0, horizontal: 10.0),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 15.0),
-                      TextFormField(
-                        controller: firstNameController,
-                        decoration: InputDecoration(
-                          labelText: 'First Name',
-                          filled: true,
-                          fillColor: Colors.white,
-                          contentPadding: EdgeInsets.symmetric(
-                              vertical: 13.0, horizontal: 10.0),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 15.0),
-
-                      TextFormField(
-                        controller: lastNameController,
-                        decoration: InputDecoration(
-                          labelText: 'Last Name',
-                          filled: true,
-                          fillColor: Colors.white,
-                          contentPadding: EdgeInsets.symmetric(
-                              vertical: 13.0, horizontal: 10.0),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 15.0),
-
-                      TextFormField(
-                        controller: mobileController,
-                        keyboardType: TextInputType.phone,
-                        decoration: InputDecoration(
-                          labelText: 'Mobile',
-                          filled: true,
-                          fillColor: Colors.white,
-                          contentPadding: EdgeInsets.symmetric(
-                              vertical: 13.0, horizontal: 10.0),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 15.0),
-                      TextFormField(
-                        controller: alternativeMobileController,
-                        keyboardType: TextInputType.phone,
-                        decoration: InputDecoration(
-                          labelText: 'Alternative Mobile',
-                          filled: true,
-                          fillColor: Colors.white,
-                          contentPadding: EdgeInsets.symmetric(
-                              vertical: 13.0, horizontal: 10.0),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 15.0),
-                      TextFormField(
-                        controller: emailController,
-                        keyboardType: TextInputType.emailAddress,
-                        decoration: InputDecoration(
-                          labelText: 'Email',
-                          filled: true,
-                          fillColor: Colors.white,
-                          contentPadding: EdgeInsets.symmetric(
-                              vertical: 13.0, horizontal: 10.0),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 15.0),
-                      TextFormField(
-                        controller: localityController,
-                        decoration: InputDecoration(
-                          labelText: 'Locality',
+                          labelText: 'Sr No',
                           filled: true,
                           fillColor: Colors.white,
                           contentPadding: EdgeInsets.symmetric(
@@ -423,6 +409,109 @@ class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
                                 dateController.text = formattedDate;
                               }
                             },
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 15.0),
+                      DropdownButtonFormField<String>(
+                        value: selectCenterController.text.isNotEmpty
+                            ? selectCenterController.text
+                            : null,
+                        onChanged: (String? value) {
+                          setState(() {
+                            selectCenterController.text = value!;
+                          });
+                        },
+                        items: centerList.map((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                        decoration: InputDecoration(
+                          labelText: 'Select Center',
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding:
+                          EdgeInsets.symmetric(vertical: 13.0, horizontal: 10.0),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 15.0),
+
+                      TextFormField(
+                        controller: firstNameController,
+                        decoration: InputDecoration(
+                          labelText: 'First Name',
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: EdgeInsets.symmetric(
+                              vertical: 13.0, horizontal: 10.0),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 15.0),
+
+                      TextFormField(
+                        controller: lastNameController,
+                        decoration: InputDecoration(
+                          labelText: 'Last Name',
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: EdgeInsets.symmetric(
+                              vertical: 13.0, horizontal: 10.0),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 15.0),
+
+                      TextFormField(
+                        controller: mobileController,
+                        keyboardType: TextInputType.phone,
+                        decoration: InputDecoration(
+                          labelText: 'Mobile Number',
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: EdgeInsets.symmetric(
+                              vertical: 13.0, horizontal: 10.0),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 15.0),
+                      TextFormField(
+                        controller: alternativeMobileController,
+                        keyboardType: TextInputType.phone,
+                        decoration: InputDecoration(
+                          labelText: 'Alternate Mobile Number',
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: EdgeInsets.symmetric(
+                              vertical: 13.0, horizontal: 10.0),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 15.0),
+                      TextFormField(
+                        controller: emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: InputDecoration(
+                          labelText: 'Email',
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: EdgeInsets.symmetric(
+                              vertical: 13.0, horizontal: 10.0),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
                           ),
                         ),
                       ),
@@ -468,7 +557,6 @@ class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
                             selectedCity = '';
                             states.clear();
                             cities.clear();
-                            print("gbghbihfjvuhhuhgvbduhsi");
                             fetchStates(selectedCountry);
                           });
                         },
@@ -492,8 +580,7 @@ class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
                       SizedBox(height: 15.0),
                       // Add the state dropdown
                       DropdownButtonFormField<String>(
-                        value: selectedState.isNotEmpty &&
-                            states.contains(selectedState)
+                        value: selectedState.isNotEmpty && states.contains(selectedState)
                             ? selectedState
                             : null,
                         onChanged: (String? value) {
@@ -504,7 +591,9 @@ class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
                             fetchCities(selectedState);
                           });
                         },
-                        items: states.map((state) => DropdownMenuItem<String>(
+                        isExpanded: true, // This fixes the overflow issue
+                        items: states
+                            .map((state) => DropdownMenuItem<String>(
                           value: state,
                           child: Text(state),
                         ))
@@ -555,6 +644,22 @@ class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
                       ),
 
                       SizedBox(height: 15.0),
+                      TextFormField(
+                        controller: localityController,
+                        decoration: InputDecoration(
+                          labelText: 'Locality',
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: EdgeInsets.symmetric(
+                              vertical: 13.0, horizontal: 10.0),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                        ),
+                      ),
+
+                      SizedBox(height: 15.0),
+
                       // DropdownButtonFormField<String>(
                       //   value: ageGroupController.text.isNotEmpty
                       //       ? ageGroupController.text
@@ -595,33 +700,33 @@ class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
                       //   ),
                       // ),
                       // SizedBox(height: 15.0),
-                      // DropdownButtonFormField<String>(
-                      //   value: genderController.text.isNotEmpty
-                      //       ? genderController.text
-                      //       : null,
-                      //   onChanged: (String? value) {
-                      //     setState(() {
-                      //       genderController.text = value!;
-                      //     });
-                      //   },
-                      //   items: ['Male', 'Female', 'Others'].map((String value) {
-                      //     return DropdownMenuItem<String>(
-                      //       value: value,
-                      //       child: Text(value),
-                      //     );
-                      //   }).toList(),
-                      //   decoration: InputDecoration(
-                      //     labelText: 'Select Gender',
-                      //     filled: true,
-                      //     fillColor: Colors.white,
-                      //     contentPadding: EdgeInsets.symmetric(
-                      //         vertical: 13.0, horizontal: 10.0),
-                      //     border: OutlineInputBorder(
-                      //       borderRadius: BorderRadius.circular(10.0),
-                      //     ),
-                      //   ),
-                      // ),
-                      // SizedBox(height: 15.0),
+                      DropdownButtonFormField<String>(
+                        value: genderController.text.isNotEmpty
+                            ? genderController.text
+                            : null,
+                        onChanged: (String? value) {
+                          setState(() {
+                            genderController.text = value!;
+                          });
+                        },
+                        items: ['Male', 'Female', 'Others'].map((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                        decoration: InputDecoration(
+                          labelText: 'Select Gender',
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: EdgeInsets.symmetric(
+                              vertical: 13.0, horizontal: 10.0),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 15.0),
                       DropdownButtonFormField<String>(
                         value: statusController.text.isNotEmpty
                             ? statusController.text
@@ -677,36 +782,26 @@ class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
                       ),
                       SizedBox(height: 15.0),
                       DropdownButtonFormField<String>(
-                        value: selectCenterController.text.isNotEmpty
-                            ? selectCenterController.text
+                        value: selectedCoordinator.isNotEmpty &&
+                            coordinators.contains(selectedCoordinator)
+                            ? selectedCoordinator
                             : null,
                         onChanged: (String? value) {
                           setState(() {
-                            selectCenterController.text = value!;
+                            selectedCoordinator = value ?? '';
+
+
+                            print("gbghbihfjvuhhuhgvbduhsi");
                           });
                         },
-                        items: ['Salimar Bag', 'Ashok Vihar','Online'].map((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value),
-                          );
-                        }).toList(),
+                        items: coordinators
+                            .map((country) => DropdownMenuItem<String>(
+                          value: country,
+                          child: Text(country),
+                        ))
+                            .toList(),
                         decoration: InputDecoration(
-                          labelText: 'Select Center',
-                          filled: true,
-                          fillColor: Colors.white,
-                          contentPadding: EdgeInsets.symmetric(
-                              vertical: 13.0, horizontal: 10.0),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 15.0),
-                      TextFormField(
-                        controller: coordinatorController,
-                        decoration: InputDecoration(
-                          labelText: 'Coordinator',
+                          labelText: 'Select Coordinator',
                           filled: true,
                           fillColor: Colors.white,
                           contentPadding: EdgeInsets.symmetric(
@@ -829,7 +924,7 @@ class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
             // 'profession': enquiry['profession'],
             // 'qualification': enquiry['qualification'],
             // 'age_group': enquiry['age_group'],
-            // 'gender': enquiry['gender'],
+            'gender': enquiry['gender'],
             'cordinator': enquiry['cordinator'],
             'source': enquiry['source'],
             'created_by': enquiry['created_by'],
@@ -857,39 +952,43 @@ class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
         firstNameController.text.isEmpty ||
         lastNameController.text.isEmpty ||
         mobileController.text.isEmpty ||
-        emailController.text.isEmpty ||
+        // emailController.text.isEmpty ||
         // addressController.text.isEmpty ||
         // professionController.text.isEmpty ||
         // qualificationController.text.isEmpty ||
         // ageGroupController.text.isEmpty ||
-        // genderController.text.isEmpty ||
-        coordinatorController.text.isEmpty ||
+        genderController.text.isEmpty ||
+        selectedCoordinator.isEmpty ||
         sourceController.text.isEmpty) {
       Utils.showAlertDialog(context, "Please fill in all fields");
       return;
     }
 
     // Validate email format
-    if (!Utils.isEmailValid(emailController.text)) {
+    // if (!Utils.isEmailValid(emailController.text)) {
+    //   Utils.showAlertDialog(context, "Please enter a valid email!");
+    //   return;
+    // }
+    if (emailController.text.isNotEmpty &&
+        !Utils.isEmailValid(emailController.text)) {
       Utils.showAlertDialog(context, "Please enter a valid email!");
       return;
     }
-
     // Validate mobile numbers
     if (mobileController.text.length != 10) {
       Utils.showAlertDialog(context, "Enter a valid 10-digit mobile number!");
       return;
     }
 
-    if (alternativeMobileController.text.length != 10) {
-      Utils.showAlertDialog(context, "Enter a valid 10-digit alternative mobile number!");
-      return;
-    }
-
-    if (mobileController.text == alternativeMobileController.text) {
-      Utils.showAlertDialog(context, "Mobile numbers cannot be the same!");
-      return;
-    }
+    // if (alternativeMobileController.text.length != 10) {
+    //   Utils.showAlertDialog(context, "Enter a valid 10-digit alternative mobile number!");
+    //   return;
+    // }
+    //
+    // if (mobileController.text == alternativeMobileController.text) {
+    //   Utils.showAlertDialog(context, "Mobile numbers cannot be the same!");
+    //   return;
+    // }
 
     // Fetch stored data
     String? response = await Utils.getStringFromPrefs(Constant.MEMBER_API);
@@ -953,8 +1052,8 @@ class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
       // "profession": professionController.text,
       // "qualification": qualificationController.text,
       // "age_group": ageGroupController.text,
-      // "gender": genderController.text,
-      "cordinator": coordinatorController.text,
+      "gender": genderController.text,
+      "cordinator": selectedCoordinator,
       "source": sourceController.text,
       "login_id": (await Utils.getStringFromPrefs(Constant.ROLL_ID)),
       "id": widget.employeeId.toString()
@@ -1064,12 +1163,8 @@ class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
     ];
     genderController.text = details['gender'].toString();
     genders = ['Male', 'Female', 'Others'];
-    coordinatorController.text = details['cordinator'].toString();
+    selectedCoordinator = details['cordinator'].toString();
     sourceController.text = details['source'].toString();
-   // selectedCountry =  details['country'].toString();
- //   selectedState =  details['state'].toString();
- //   selectedCity =  details['city'].toString();
-
 
     sources = [
       'Google',
@@ -1080,7 +1175,16 @@ class _UpdateEnquiryScreenState extends State<UpdateEnquiryScreen> {
       'By a friend',
       'Others'
     ];
-   await  fetchCountries();
+    await  fetchCountries();
+    await fetchStates(details['country'].toString());
+    await fetchCities(details['state']);
+    // await fetchStates(details['state']);
+    // fetchMemberList();
+
+    Future.delayed(Duration(milliseconds: 1000), () {
+      // fetchStates("India");
+      fetchMemberList();
+    });
 
     setState(() {});
   }
