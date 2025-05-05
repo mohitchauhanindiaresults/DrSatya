@@ -20,12 +20,61 @@ class _SalesListingState extends State<SalesListing> {
   String selectedPotentiality = '';
   String selectedSource = '';
   final Dio _dio = ApiInterceptor.createDio(); // Use ApiInterceptor to create Dio instance
+  List<Map<String, dynamic>> memberList = [];
+  String error = '';
+  List<String> programList = [];
 
   @override
   void initState() {
     super.initState();
     employeeDetails = initiate();
+    fetchProgramLis();
   }
+  Future<void> fetchProgramLis() async {
+    try {
+      // Replace 'YOUR_API_ENDPOINT' with the actual API endpoint
+      Response response = await _dio.get('http://clients.charumindworks.com/satya/api/programSubprogramAddList');
+      Map<String, dynamic> responseData = response.data;
+      print("fdfgdfhferdgfefgfgfef"+response.toString());
+ //     apiResponse = response.toString();
+
+      //  Utils.saveStringToPrefs(Constant.PROGRAM_API, response.data);
+      if (responseData['status'] == 'false') {
+        List<dynamic> coordinatorList = responseData['programList'];
+        print(coordinatorList);
+    //    leadIdController.text= response.data['lead_code'];
+        setState(() {
+        //  memberList = List<Map<String, dynamic>>.from(coordinatorList.where((element) => element['parent_id'] == null ));
+          // filteredMemberList = memberList;
+       //   isLoading = false;
+
+          // Extracting names and adding them to a separate list
+          List<String> names = [];
+          for (var coordinator in coordinatorList) {
+            if (coordinator['parent_id'] == null) {
+              programList.add(coordinator['name']);
+           //   programId.add(coordinator['id']);
+            }
+          }
+        // print("hgcggddfsdfuvgvhh"+programId.toString());
+         // print("hgcggddfsdfuvgvhh"+programId.toString());
+        });
+
+
+      } else {
+        setState(() {
+          error = 'Failed to fetch data. ${responseData['message']}';
+       //   isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        error = 'Failed to fetch data. Please try again.';
+     //   isLoading = false;
+      });
+    }
+  }
+
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -145,7 +194,7 @@ class _SalesListingState extends State<SalesListing> {
                     Expanded(
                       flex: 1,
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10.0), // Padding Left & Right
+                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
                         child: DropdownButtonFormField<String>(
                           value: selectedStatus.isNotEmpty ? selectedStatus : null,
                           isExpanded: true,
@@ -155,17 +204,19 @@ class _SalesListingState extends State<SalesListing> {
                             filled: true,
                             fillColor: Colors.white,
                           ),
-                          hint: Text('Select Status',style: TextStyle(fontSize: 12)),
+                          hint: Text('Select Program', style: TextStyle(fontSize: 12)),
                           onChanged: (String? newValue) {
                             setState(() {
                               selectedStatus = newValue ?? '';
                             });
                           },
-                          items: <String>['', 'New enquiry', 'Old enquiry', 'Current member', 'Old member']
-                              .map((String value) {
+                          items: programList
+                            //  .map((member) => member['status'] as String)
+                              .toSet() // remove duplicates
+                              .map((status) {
                             return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(value.isNotEmpty ? value : 'Select Status',style: TextStyle(fontSize: 12)),
+                              value: status,
+                              child: Text(status, style: TextStyle(fontSize: 12)),
                             );
                           }).toList(),
                         ),
@@ -221,7 +272,7 @@ class _SalesListingState extends State<SalesListing> {
                     // Filtering logic
                     if (selectedStatus.isNotEmpty) {
                       salesList = salesList
-                          .where((sale) => sale['status'] == selectedStatus)
+                          .where((sale) => sale['program'] == selectedStatus)
                           .toList();
                     }
                     if (selectedPotentiality.isNotEmpty) {
@@ -413,29 +464,56 @@ class _SalesListingState extends State<SalesListing> {
                                   SizedBox(height: 12),
 
                                   // Follow-up Button
-                                  Align(
-                                    alignment: Alignment.centerRight,
-                                    child: ElevatedButton(
-                                      onPressed: () {
-                                        onFollowUpPressed(sale);
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.orange,
-                                        minimumSize: Size(80, 32), // Smaller width and height
-                                        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8), // Internal padding smaller
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(8),
+                                  Row(children: [
+                                    Align(
+                                      alignment: Alignment.centerRight,
+                                      child: ElevatedButton(
+                                        onPressed: () {
+                                       //   transferLead();
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.orange,
+                                          minimumSize: Size(80, 32), // Smaller width and height
+                                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8), // Internal padding smaller
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
                                         ),
-                                      ),
-                                      child: Text(
-                                        'Follow Up',
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          color: Colors.white,
+                                        child: Text(
+                                          'Transfer lead',
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            color: Colors.white,
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
+                                    SizedBox(width: 20,),
+                                    Align(
+                                      alignment: Alignment.centerRight,
+                                      child: ElevatedButton(
+                                        onPressed: () {
+                                          onFollowUpPressed(sale);
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.orange,
+                                          minimumSize: Size(80, 32), // Smaller width and height
+                                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8), // Internal padding smaller
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                        ),
+                                        child: Text(
+                                          'Follow Up',
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+
+                                  ],)
 
                                 ],
                               ),
