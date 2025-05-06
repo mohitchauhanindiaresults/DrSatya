@@ -414,7 +414,7 @@ class _AddBilllingFormState extends State<AddBilllingForm> {
                         controller: treatment,
                         keyboardType: TextInputType.number,
                         decoration: InputDecoration(
-                          labelText: 'Fill Treatment Fees',
+                          labelText: 'Fill Treatment Cost',
                           filled: true,
                           fillColor: Colors.white,
                           contentPadding: EdgeInsets.symmetric(
@@ -746,6 +746,9 @@ class _AddBilllingFormState extends State<AddBilllingForm> {
       "cordinator": selectedCoordinator,
       "status": Status.text,
       "source": Source.text,
+      "terms":"NA",
+      "full_address":" ",
+      "firm_name":" ",
       "terms":"NA",
       "created_by": (await Utils.getStringFromPrefs(Constant.ROLL_ID))
 
