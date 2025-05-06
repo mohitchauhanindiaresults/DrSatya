@@ -332,9 +332,9 @@ class _LoginScreenState extends State<LoginScreen> {
           print("track1");
 
           // Save user details in shared preferences
-          String roll = profileDetails.user!.id.toString();
+         // String roll = profileDetails.user!.id.toString();
           Utils.saveStringToPrefs(Constant.USER_ID, profileDetails.user!.id.toString());
-          Utils.saveStringToPrefs(Constant.ROLL_ID, roll);
+          Utils.saveStringToPrefs(Constant.ROLL_ID, profileDetails.user!.role.toString());
           Utils.saveStringToPrefs(Constant.NAME, profileDetails.user!.name.toString());
           Utils.saveStringToPrefs(Constant.TOKEN, profileDetails.user!.accessToken.toString());
           Utils.saveStringToPrefs(Constant.DESIGNATION, profileDetails.user!.designation.toString());

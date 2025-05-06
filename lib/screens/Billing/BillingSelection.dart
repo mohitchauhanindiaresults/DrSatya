@@ -64,7 +64,7 @@ class _BilllingSelectionState extends State<BilllingSelection> {
       appBar: AppBar(
         backgroundColor: Color(0xFF14B3B4),
         title: Text(
-          'Choose Master Data From List',
+          'Billing',
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
