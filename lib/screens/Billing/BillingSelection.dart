@@ -31,8 +31,12 @@ class _BilllingSelectionState extends State<BilllingSelection> {
       final Dio dio = Dio();
       final response = await dio.get(
         "https://clients.charumindworks.com/satya/api/enquiry",
+        queryParameters: {
+          "page_type": "billing", // Ensure no extra spaces or quotes
+        },
       );
 
+      print(response.data);
       if (response.statusCode == 200) {
         final jsonResponse = response.data;
         Utils.printLongString(jsonResponse.toString());
@@ -53,6 +57,7 @@ class _BilllingSelectionState extends State<BilllingSelection> {
     } catch (e) {
       setState(() {
         error = 'Error: $e';
+        print(error);
         isLoading = false;
       });
     }
@@ -157,7 +162,7 @@ class _BilllingSelectionState extends State<BilllingSelection> {
                           crossAxisAlignment:
                           CrossAxisAlignment.start,
                           children: [
-                            Text('Age Group: ${member['age_group']}'),
+                            Text('Balance Amount: ${member['balance']}'),
                             Text('Mobile: ${member['mobile']}'),
                           ],
                         ),

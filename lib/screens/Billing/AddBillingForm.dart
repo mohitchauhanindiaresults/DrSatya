@@ -28,12 +28,14 @@ class _AddBilllingFormState extends State<AddBilllingForm> {
   TextEditingController transectionController = TextEditingController();
   TextEditingController sub_program = TextEditingController();
   TextEditingController packageDetail = TextEditingController();
+  TextEditingController full_address = TextEditingController();
   TextEditingController treatment = TextEditingController();
   TextEditingController payment_recived = TextEditingController();
   TextEditingController balance = TextEditingController();
   TextEditingController recivedinwords = TextEditingController();
   TextEditingController Validity = TextEditingController();
   TextEditingController Source = TextEditingController();
+  TextEditingController firm_name = TextEditingController();
   TextEditingController Assigned_to = TextEditingController();
   TextEditingController Status = TextEditingController();
   TextEditingController PaymentMode = TextEditingController();
@@ -423,6 +425,12 @@ class _AddBilllingFormState extends State<AddBilllingForm> {
                             borderRadius: BorderRadius.circular(10.0),
                           ),
                         ),
+                        onChanged: (String? value) {
+                          setState(() {
+                            balance.text= (int.parse(treatment.text)-int.parse(payment_recived.text)).toString();
+                            // Validity.text = value!;
+                          });
+                        },
                       ),
                       SizedBox(height: 15.0),
                       TextFormField(
@@ -438,9 +446,17 @@ class _AddBilllingFormState extends State<AddBilllingForm> {
                             borderRadius: BorderRadius.circular(10.0),
                           ),
                         ),
+                        onChanged: (String? value) {
+                          setState(() {
+                            balance.text= (int.parse(treatment.text)-int.parse(payment_recived.text)).toString();
+                           // Validity.text = value!;
+                          });
+                        },
                       ),
                       SizedBox(height: 15.0),
                       TextFormField(
+                       // readOnly: true,
+                        enabled: false,
                         controller: balance,
                         keyboardType: TextInputType.number,
                         decoration: InputDecoration(
@@ -583,6 +599,49 @@ class _AddBilllingFormState extends State<AddBilllingForm> {
                           ),
                         ),
                       ),
+                      SizedBox(height: 15.0),
+                      DropdownButtonFormField<String>(
+                        value: firm_name.text.isNotEmpty ? firm_name.text : null,
+                        onChanged: (String? value) {
+                          setState(() {
+                            firm_name.text = value!;
+                          });
+                        },
+                        items: ['Firm A', 'Firm B', 'Firm C']
+                            .map((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                        decoration: InputDecoration(
+                          labelText: 'Select Firm',
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: EdgeInsets.symmetric(
+                              vertical: 13.0, horizontal: 10.0),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 15.0),
+
+                      TextFormField(
+                        controller: full_address,
+                        keyboardType: TextInputType.text,
+                        decoration: InputDecoration(
+                          labelText: 'Full Address',
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: EdgeInsets.symmetric(
+                              vertical: 13.0, horizontal: 10.0),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                        ),
+                      ),
+
                     ],
                   ),
                 ),
@@ -596,11 +655,7 @@ class _AddBilllingFormState extends State<AddBilllingForm> {
                       // Show an error message or handle the validation failure as needed.
                       Utils.showAlertDialog(
                           context, "Please fill in all fields");
-                    } else if (mobileController.text.length != 10) {
-                      Utils.showAlertDialog(context, "Enter correct mobile !!");
-                    } else if (alternativeMobileController.text.length != 10) {
-                      Utils.showAlertDialog(context, "Enter correct mobile !!");
-                    } else if (mobileController.text ==
+                    }  else if (mobileController.text ==
                         alternativeMobileController.text) {
                       Utils.showAlertDialog(
                           context, "Numbers cannot be same !!");
@@ -612,19 +667,20 @@ class _AddBilllingFormState extends State<AddBilllingForm> {
                       firstNameController.text.isEmpty ||
                           lastNameController.text.isEmpty ||
                           mobileController.text.isEmpty ||
-                          alternativeMobileController.text.isEmpty ||
                           transectionController.text.isEmpty ||
                           programString.isEmpty ||
                           subprogramString.isEmpty ||
                           packageDetail.text.isEmpty ||
                           Validity.text.isEmpty ||
                           treatment.text.isEmpty ||
+                          firm_name.text.isEmpty ||
                           payment_recived.text.isEmpty ||
                           balance.text.isEmpty ||
                           recivedinwords.text.isEmpty ||
                           PaymentMode.text.isEmpty ||
                           selectedCoordinator.isEmpty ||
                           Status.text.isEmpty ||
+                          full_address.text.isEmpty ||
                           Source.text.isEmpty
                       ) {
                         Fluttertoast.showToast(msg: "All fields are required.");
@@ -746,10 +802,10 @@ class _AddBilllingFormState extends State<AddBilllingForm> {
       "cordinator": selectedCoordinator,
       "status": Status.text,
       "source": Source.text,
+      "full_address":full_address.text,
+      "firm_name": firm_name.text,
       "terms":"NA",
-      "full_address":" ",
-      "firm_name":" ",
-      "terms":"NA",
+      "followup_id":widget.employeeId,
       "created_by": (await Utils.getStringFromPrefs(Constant.ROLL_ID))
 
     };
