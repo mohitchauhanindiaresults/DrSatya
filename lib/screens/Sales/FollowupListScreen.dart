@@ -55,7 +55,7 @@ class _FollowupListScreenState extends State<FollowupListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Follow-up List', style: TextStyle(fontSize: 16)),
+        title: const Text('Follow-up History', style: TextStyle(fontSize: 16)),
         backgroundColor: themeColor,
         foregroundColor: Colors.white,
       ),
@@ -81,14 +81,15 @@ class _FollowupListScreenState extends State<FollowupListScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildRow('Date:', item['date']),
-                  _buildRow('Time:', _formatTime(item['time'])),
-                  _buildRow('Initial Datetime:', _formatDateTime(item['initial_datetime'])),
-                  _buildRow('Action:', item['action'] ?? 'N/A'),
-                  _buildRow('Status:', item['status']),
-                  _buildRow('Action Status:', item['action_status']),
-                  _buildRow('Remark:', item['remark']),
+                  _buildRow('Date:', item['date'] ?? 'N/A'),
+                  _buildRow('Time:', _formatTime(item['time'] ?? '')),
+                  _buildRow('Initial Datetime:', _formatDateTime(item['initial_datetime'] ?? '')),
+              //    _buildRow('Action:', item['action'] ?? 'N/A'),
+                  _buildRow('Status:', item['status'] ?? 'N/A'),
+                  _buildRow('Action Status:', item['action_status'] ?? 'N/A'),
+                  _buildRow('Remark:', item['remark'] ?? 'N/A'),
                 ],
+
 
               ),
             ),

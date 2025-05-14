@@ -155,6 +155,7 @@ class _BilllingSelectionState extends State<BilllingSelection> {
                         title: Text(
                           member['first_name'],
                           style: TextStyle(
+                            fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -162,8 +163,32 @@ class _BilllingSelectionState extends State<BilllingSelection> {
                           crossAxisAlignment:
                           CrossAxisAlignment.start,
                           children: [
-                            Text('Balance Amount: ${member['balance']}'),
-                            Text('Mobile: ${member['mobile']}'),
+                            Text.rich(
+                              TextSpan(
+                                text: 'Balance To Be Paid: ',
+                                style: TextStyle(color: Colors.black87), // Light or default text
+                                children: [
+                                  TextSpan(
+                                    text: '₹${member['balance']}',
+                                    style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold), // Dark text
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            Text.rich(
+                              TextSpan(
+                                text: 'Mobile: ',
+                                style: TextStyle(color: Colors.black87),
+                                children: [
+                                  TextSpan(
+                                    text: '${member['mobile']}',
+                                    style: TextStyle(color: Colors.black, ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
                           ],
                         ),
                       ),

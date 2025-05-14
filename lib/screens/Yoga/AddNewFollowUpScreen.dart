@@ -198,7 +198,7 @@ class _AddNewFollowUpScreenState extends State<AddNewFollowUpScreen> {
                           borderRadius: BorderRadius.circular(8)),
                     ),
                     style: TextStyle(fontSize: 14, color: Colors.black),
-                    items: <String>['Billing', 'Close', 'Next Follow Up']
+                    items: <String>['Billing', 'Not Interested', 'Next Follow Up']
                         .map((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
