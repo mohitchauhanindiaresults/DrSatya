@@ -30,8 +30,11 @@ import 'package:sn_progress_dialog/progress_dialog.dart';
     String RoleId = '';
     List<String> programList = [];
      List<String> coordinators = [];
+     TextEditingController _searchController = TextEditingController();
+     List<dynamic> salesList=[];
+     List<dynamic> filteredSalesList = [];
 
-    @override
+     @override
     void initState() {
       super.initState();
       initiate1();
@@ -44,121 +47,22 @@ import 'package:sn_progress_dialog/progress_dialog.dart';
       print(employeeDetails.toString());
       await  fetchProgramLis();
       await  fetchMemberList();
+      filteredSalesList = salesList;
+      _searchController.addListener(_filterSales);
     }
-     Future<void> fetchMemberList() async {
-       try {
-         // Replace 'YOUR_API_ENDPOINT' with the actual API endpoint
-         Response response = await Dio().get(
-             'https://clients.charumindworks.com/satya/api/cordinatorAddList');
-         Map<String, dynamic> responseData = response.data;
-         print(response.data);
 
-         if (responseData['status'] == 'false') {
-           List<dynamic> coordinatorList = responseData['cordinatorList'];
-           print(coordinatorList);
-           setState(() {
-             memberList = List<Map<String, dynamic>>.from(coordinatorList);
-             // filteredMemberList = memberList;
+     void _filterSales() {
+       String query = _searchController.text.toLowerCase();
 
-
-             // Extracting names and adding them to a separate list
-             List<String> names = [];
-             for (var coordinator in coordinatorList) {
-               coordinators.add(coordinator['name']);
-             }
-
-             // Now 'names' contains the list of names from 'cordinatorList'
-             print(names);
-           });
-         } else {
-           setState(() {
-             error = 'Failed to fetch data. ${responseData['message']}';
-
-           });
-         }
-       } catch (e) {
-         setState(() {
-           error = 'Failed to fetch data. Please try again.';
-
-         });
-       }
+       setState(() {
+         print("object");
+         filteredSalesList = salesList.where((sale) {
+           String name = sale['name'].toString().toLowerCase();
+           print(name);
+           return name.contains(query);
+         }).toList();
+       });
      }
-     Future<void> fetchProgramLis() async {
-      try {
-        // Replace 'YOUR_API_ENDPOINT' with the actual API endpoint
-        Response response = await _dio.get('http://clients.charumindworks.com/satya/api/programSubprogramAddList');
-        Map<String, dynamic> responseData = response.data;
-        print("fdfgdfhferdgfefgfgfef"+response.toString());
-   //     apiResponse = response.toString();
-  
-        //  Utils.saveStringToPrefs(Constant.PROGRAM_API, response.data);
-        if (responseData['status'] == 'false') {
-          List<dynamic> coordinatorList = responseData['programList'];
-          print(coordinatorList);
-      //    leadIdController.text= response.data['lead_code'];
-          setState(() {
-          //  memberList = List<Map<String, dynamic>>.from(coordinatorList.where((element) => element['parent_id'] == null ));
-            // filteredMemberList = memberList;
-         //   isLoading = false;
-  
-            // Extracting names and adding them to a separate list
-            List<String> names = [];
-            for (var coordinator in coordinatorList) {
-              if (coordinator['parent_id'] == null) {
-                programList.add(coordinator['name']);
-             //   programId.add(coordinator['id']);
-              }
-            }
-          // print("hgcggddfsdfuvgvhh"+programId.toString());
-           // print("hgcggddfsdfuvgvhh"+programId.toString());
-          });
-  
-  
-        } else {
-          setState(() {
-            error = 'Failed to fetch data. ${responseData['message']}';
-         //   isLoading = false;
-          });
-        }
-      } catch (e) {
-        setState(() {
-          error = 'Failed to fetch data. Please try again.';
-       //   isLoading = false;
-        });
-      }
-    }
-     Future<void> _selectDate(BuildContext context) async {
-      final DateTime? picked = await showDatePicker(
-        context: context,
-        initialDate: DateTime.now(),
-        firstDate: DateTime(2000),
-        lastDate: DateTime(2101),
-        builder: (BuildContext context, Widget? child) {
-          return MediaQuery(
-            data: MediaQuery.of(context).copyWith(textScaleFactor: 0.80), // Reduce overall scale
-            child: Theme(
-              data: Theme.of(context).copyWith(
-                datePickerTheme: DatePickerThemeData(
-                  dayStyle: TextStyle(fontSize: 15),
-                  weekdayStyle: TextStyle(fontSize: 11),
-                  yearStyle: TextStyle(fontSize: 11),
-                  headerHeadlineStyle: TextStyle(fontSize: 13),
-                  headerHelpStyle: TextStyle(fontSize: 10),
-                ),
-              ),
-              child: child!,
-            ),
-          );
-        },
-      );
-  
-      if (picked != null) {
-        setState(() {
-          var _dateController = DateFormat('yyyy-MM-dd').format(picked);
-        });
-      }
-    }
-  
   
   
     @override
@@ -239,6 +143,7 @@ import 'package:sn_progress_dialog/progress_dialog.dart';
                         // ),
                       ],
                     ),
+
                   ),
                   SizedBox(height: 8.0),
                   Row(
@@ -305,8 +210,35 @@ import 'package:sn_progress_dialog/progress_dialog.dart';
                       ),
                     ],
                   ),
-  
+                  SizedBox(height: 5,),
+                  SizedBox(
+                    height: 40, // Controls the overall height of the search bar
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                      child: TextField(
+                        controller: _searchController,
+                        style: TextStyle(color: Colors.black, fontSize: 14),
+                        decoration: InputDecoration(
+                          labelText: "Search by Name",
+                          labelStyle: TextStyle(color: Colors.grey[700], fontSize: 14),
+                          prefixIcon: Icon(Icons.search, color: Colors.grey[700], size: 20),
+                          filled: true,
+                          fillColor: Colors.white, // White background
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: Colors.grey.shade300),
+                          ),
+                          isDense: true,
+                          contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                        ),
+                      ),
+                    ),
+                  ),
+
+
+
                 ],
+
               ),
 
 
@@ -321,29 +253,29 @@ import 'package:sn_progress_dialog/progress_dialog.dart';
                     } else if (snapshot.hasError) {
                       return Center(child: Text('Error loading data'));
                     } else {
-                      List<dynamic> salesList = snapshot.data!['sales'];
+                      salesList = snapshot.data!['sales'];
 
                       // Filtering logic
                       if (selectedStatus.isNotEmpty) {
-                        salesList = salesList
+                        filteredSalesList = filteredSalesList
                             .where((sale) => sale['program'] == selectedStatus)
                             .toList();
                       }
                       if (selectedPotentiality.isNotEmpty) {
-                        salesList = salesList
+                        filteredSalesList = filteredSalesList
                             .where((sale) => sale['potentiality'] == selectedPotentiality)
                             .toList();
                       }
                       if (selectedSource.isNotEmpty) {
-                        salesList = salesList
+                        filteredSalesList = filteredSalesList
                             .where((sale) => sale['source'] == selectedSource)
                             .toList();
                       }
 
                       return ListView.builder(
-                        itemCount: salesList.length,
+                        itemCount: filteredSalesList.length,
                         itemBuilder: (context, index) {
-                          Map<String, dynamic> sale = salesList[index];
+                          Map<String, dynamic> sale = filteredSalesList[index];
 
                           return Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -364,11 +296,11 @@ import 'package:sn_progress_dialog/progress_dialog.dart';
                               },
                               child: Card(
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
-                                elevation: 4,
+                                elevation: 3,
                                 child: Padding(
-                                  padding: const EdgeInsets.all(12.0),
+                                  padding: const EdgeInsets.all(8.0),
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
@@ -378,15 +310,15 @@ import 'package:sn_progress_dialog/progress_dialog.dart';
                                         children: [
                                           Text(
                                             sale['name'],
-                                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                                           ),
                                           Text(
                                             sale['mobile'],
-                                            style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+                                            style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                                           ),
                                         ],
                                       ),
-                                      SizedBox(height: 8),
+                                      SizedBox(height: 6),
 
                                       // Program + Subprogram
                                       Row(
@@ -394,18 +326,19 @@ import 'package:sn_progress_dialog/progress_dialog.dart';
                                           Expanded(
                                             child: Text(
                                               "Program: ${sale['program']}",
-                                              style: TextStyle(fontSize: 12),
+                                              style: TextStyle(fontSize: 10),
                                             ),
                                           ),
+                                          SizedBox(width: 4),
                                           Expanded(
                                             child: Text(
-                                              "Sub Program: ${sale['sub_program']}",
-                                              style: TextStyle(fontSize: 12),
+                                              "Sub: ${sale['sub_program']}",
+                                              style: TextStyle(fontSize: 10),
                                             ),
                                           ),
                                         ],
                                       ),
-                                      SizedBox(height: 8),
+                                      SizedBox(height: 6),
 
                                       // Potentiality + Source
                                       Row(
@@ -414,33 +347,30 @@ import 'package:sn_progress_dialog/progress_dialog.dart';
                                             child: RichText(
                                               text: TextSpan(
                                                 text: "Potentiality: ",
-                                                style: TextStyle(
-                                                  fontSize: 12,
-                                                  color: Colors.black, // Static part color
-                                                ),
+                                                style: TextStyle(fontSize: 10, color: Colors.black),
                                                 children: [
                                                   TextSpan(
                                                     text: sale['potentiality'] ?? '',
                                                     style: TextStyle(
-                                                      fontSize: 12,
+                                                      fontSize: 10,
                                                       fontWeight: FontWeight.bold,
-                                                      color:Utils.getPotentialityColor(sale['potentiality']),
+                                                      color: Utils.getPotentialityColor(sale['potentiality']),
                                                     ),
                                                   ),
                                                 ],
                                               ),
                                             ),
-
                                           ),
+                                          SizedBox(width: 4),
                                           Expanded(
                                             child: Text(
                                               "Source: ${sale['source']}",
-                                              style: TextStyle(fontSize: 12),
+                                              style: TextStyle(fontSize: 10),
                                             ),
                                           ),
                                         ],
                                       ),
-                                      SizedBox(height: 8),
+                                      SizedBox(height: 6),
 
                                       // Center and Status
                                       Row(
@@ -448,18 +378,19 @@ import 'package:sn_progress_dialog/progress_dialog.dart';
                                           Expanded(
                                             child: Text(
                                               "Center: ${sale['center']}",
-                                              style: TextStyle(fontSize: 12),
+                                              style: TextStyle(fontSize: 10),
                                             ),
                                           ),
+                                          SizedBox(width: 4),
                                           Expanded(
                                             child: Text(
                                               "Status: ${sale['status']}",
-                                              style: TextStyle(fontSize: 12),
+                                              style: TextStyle(fontSize: 10),
                                             ),
                                           ),
                                         ],
                                       ),
-                                      SizedBox(height: 8),
+                                      SizedBox(height: 6),
 
                                       // Assigned To and Coordinator
                                       Row(
@@ -467,35 +398,34 @@ import 'package:sn_progress_dialog/progress_dialog.dart';
                                           Expanded(
                                             child: Text(
                                               "Assigned: ${sale['assigneduser']['name']}",
-                                              style: TextStyle(fontSize: 12),
+                                              style: TextStyle(fontSize: 10),
                                             ),
                                           ),
+                                          SizedBox(width: 4),
                                           Expanded(
                                             child: Text(
                                               "Coordinator: ${sale['cordinator']['name']}",
-                                              style: TextStyle(fontSize: 12),
+                                              style: TextStyle(fontSize: 10),
                                             ),
                                           ),
                                         ],
                                       ),
-                                      SizedBox(height: 10),
+                                      SizedBox(height: 6),
                                       Divider(),
-                                      // Assigned To and Coordinator
+
+                                      // Lead Status + Action
                                       Row(
                                         children: [
                                           Expanded(
                                             child: RichText(
                                               text: TextSpan(
                                                 text: 'Lead Status: ',
-                                                style: TextStyle(
-                                                  fontSize: 12,
-                                                  color: Colors.black, // Static text color
-                                                ),
+                                                style: TextStyle(fontSize: 10, color: Colors.black),
                                                 children: [
                                                   TextSpan(
                                                     text: sale['followinfo']['status'] ?? '',
                                                     style: TextStyle(
-                                                      fontSize: 12,
+                                                      fontSize: 10,
                                                       color: Utils.getLeadStatusColor(sale['followinfo']['status']),
                                                       fontWeight: FontWeight.bold,
                                                     ),
@@ -508,122 +438,111 @@ import 'package:sn_progress_dialog/progress_dialog.dart';
                                               ? Expanded(
                                             child: Text(
                                               "Action: ${sale['followinfo']['action_status']}",
-                                              style: TextStyle(fontSize: 12),
+                                              style: TextStyle(fontSize: 10),
                                             ),
-                                          ) : SizedBox.shrink(),
+                                          )
+                                              : SizedBox.shrink(),
                                         ],
                                       ),
-                                      SizedBox(height: 8),
+                                      SizedBox(height: 6),
                                       sale['followinfo']['initial_datetime'] != null
                                           ? Text(
-                                        "Initial Date: ${sale['followinfo']['initial_datetime']}",
-                                        style: TextStyle(fontSize: 12),
+                                        "Initial: ${sale['followinfo']['initial_datetime']}",
+                                        style: TextStyle(fontSize: 10),
                                       )
                                           : SizedBox.shrink(),
-                                      SizedBox(height: 8),
-                                       Text(
-                                        "Follow Up Date: ${sale['followinfo']['date']}  ${sale['followinfo']['time']}",
-                                        style: TextStyle(fontSize: 12),
+                                      SizedBox(height: 6),
+                                      Text(
+                                        "Follow Up: ${sale['followinfo']['date']} ${sale['followinfo']['time']}",
+                                        style: TextStyle(fontSize: 10),
                                       ),
-                                      SizedBox(height: 8),
+                                      SizedBox(height: 6),
                                       Text(
                                         "Remark: ${sale['followinfo']['remark']}",
-                                        style: TextStyle(fontSize: 12),
+                                        style: TextStyle(fontSize: 10),
                                       ),
-                                      SizedBox(height: 12),
+                                      SizedBox(height: 8),
 
-                                      // Follow-up Button
-                                      Row(children: [
-                                        Align(
-                                          alignment: Alignment.centerRight,
-                                          child: ElevatedButton(
+                                      // Follow-up Buttons
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.end,
+                                        children: [
+                                          ElevatedButton(
                                             onPressed: () {
                                               print(sale['id']);
-                                                showDialog(
-                                                  context: context,
-                                                  builder: (BuildContext context) {
-                                                    return AlertDialog(
-                                                      title: Text("Select Coordinator"),
-                                                      content: SizedBox(
-                                                        width: double.maxFinite,
-                                                        child: memberList.isNotEmpty
-                                                            ? ListView.builder(
-                                                          shrinkWrap: true,
-                                                          itemCount: memberList.length,
-                                                          itemBuilder: (context, index) {
-                                                            final coordinator = memberList[index];
-                                                            return ListTile(
-                                                              title: Text(coordinator['name']),
-                                                              onTap: () {
-                                                                print("Selected ID: ${coordinator['id']}");
-                                                                Navigator.of(context).pop(); // Close the dialog
-                                                                trasnfer_lead(context, sale['id'], coordinator['id']);
-                                                              },
-                                                            );
-                                                          },
-                                                        )
-                                                            : Center(child: Text("No Coordinators Available")),
+                                              showDialog(
+                                                context: context,
+                                                builder: (BuildContext context) {
+                                                  return AlertDialog(
+                                                    title: Text("Select Coordinator"),
+                                                    content: SizedBox(
+                                                      width: double.maxFinite,
+                                                      child: memberList.isNotEmpty
+                                                          ? ListView.builder(
+                                                        shrinkWrap: true,
+                                                        itemCount: memberList.length,
+                                                        itemBuilder: (context, index) {
+                                                          final coordinator = memberList[index];
+                                                          return ListTile(
+                                                            title: Text(coordinator['name']),
+                                                            onTap: () {
+                                                              print("Selected ID: ${coordinator['id']}");
+                                                              Navigator.of(context).pop();
+                                                              trasnfer_lead(context, sale['id'], coordinator['id']);
+                                                            },
+                                                          );
+                                                        },
+                                                      )
+                                                          : Center(child: Text("No Coordinators Available")),
+                                                    ),
+                                                    actions: [
+                                                      TextButton(
+                                                        onPressed: () => Navigator.of(context).pop(),
+                                                        child: Text("Cancel"),
                                                       ),
-                                                      actions: [
-                                                        TextButton(
-                                                          onPressed: () => Navigator.of(context).pop(),
-                                                          child: Text("Cancel"),
-                                                        ),
-                                                      ],
-                                                    );
-                                                  },
-                                                );
-
-
-                                           //   transferLead();
+                                                    ],
+                                                  );
+                                                },
+                                              );
                                             },
                                             style: ElevatedButton.styleFrom(
                                               backgroundColor: Colors.orange,
-                                              minimumSize: Size(80, 32), // Smaller width and height
-                                              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8), // Internal padding smaller
+                                              minimumSize: Size(70, 28),
+                                              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                                               shape: RoundedRectangleBorder(
                                                 borderRadius: BorderRadius.circular(8),
                                               ),
                                             ),
                                             child: Text(
                                               'Transfer Lead',
-                                              style: TextStyle(
-                                                fontSize: 10,
-                                                color: Colors.white,
-                                              ),
+                                              style: TextStyle(fontSize: 10, color: Colors.white),
                                             ),
                                           ),
-                                        ),
-                                        SizedBox(width: 20,),
-                                        Align(
-                                          alignment: Alignment.centerRight,
-                                          child: ElevatedButton(
+                                          SizedBox(width: 10),
+                                          ElevatedButton(
                                             onPressed: () {
                                               onFollowUpPressed(sale);
                                             },
-                                            style: ElevatedButton.styleFrom(
+                                            style: ElevatedButton.styleFrom (
                                               backgroundColor: Colors.orange,
-                                              minimumSize: Size(80, 32), // Smaller width and height
-                                              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8), // Internal padding smaller
+                                              minimumSize: Size(70, 28),
+                                              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                                               shape: RoundedRectangleBorder(
                                                 borderRadius: BorderRadius.circular(8),
                                               ),
                                             ),
                                             child: Text(
                                               'Follow Up',
-                                              style: TextStyle(
-                                                fontSize: 10,
-                                                color: Colors.white,
-                                              ),
+                                              style: TextStyle(fontSize: 10, color: Colors.white),
                                             ),
                                           ),
-                                        ),
-                                      ],
-                                      )
+                                        ],
+                                      ),
                                     ],
                                   ),
                                 ),
                               ),
+
                             ),
                           );
                         },
@@ -637,7 +556,119 @@ import 'package:sn_progress_dialog/progress_dialog.dart';
         ),
       );
     }
-  
+     Future<void> fetchMemberList() async {
+       try {
+         // Replace 'YOUR_API_ENDPOINT' with the actual API endpoint
+         Response response = await Dio().get(
+             'https://clients.charumindworks.com/satya/api/cordinatorAddList');
+         Map<String, dynamic> responseData = response.data;
+         print(response.data);
+
+         if (responseData['status'] == 'false') {
+           List<dynamic> coordinatorList = responseData['cordinatorList'];
+           print(coordinatorList);
+           setState(() {
+             memberList = List<Map<String, dynamic>>.from(coordinatorList);
+             // filteredMemberList = memberList;
+
+
+             // Extracting names and adding them to a separate list
+             List<String> names = [];
+             for (var coordinator in coordinatorList) {
+               coordinators.add(coordinator['name']);
+             }
+
+             // Now 'names' contains the list of names from 'cordinatorList'
+             print(names);
+           });
+         } else {
+           setState(() {
+             error = 'Failed to fetch data. ${responseData['message']}';
+
+           });
+         }
+       } catch (e) {
+         setState(() {
+           error = 'Failed to fetch data. Please try again.';
+
+         });
+       }
+     }
+     Future<void> fetchProgramLis() async {
+       try {
+         // Replace 'YOUR_API_ENDPOINT' with the actual API endpoint
+         Response response = await _dio.get('http://clients.charumindworks.com/satya/api/programSubprogramAddList');
+         Map<String, dynamic> responseData = response.data;
+         print("fdfgdfhferdgfefgfgfef"+response.toString());
+         //     apiResponse = response.toString();
+
+         //  Utils.saveStringToPrefs(Constant.PROGRAM_API, response.data);
+         if (responseData['status'] == 'false') {
+           List<dynamic> coordinatorList = responseData['programList'];
+           print(coordinatorList);
+           //    leadIdController.text= response.data['lead_code'];
+           setState(() {
+             //  memberList = List<Map<String, dynamic>>.from(coordinatorList.where((element) => element['parent_id'] == null ));
+             // filteredMemberList = memberList;
+             //   isLoading = false;
+
+             // Extracting names and adding them to a separate list
+             List<String> names = [];
+             for (var coordinator in coordinatorList) {
+               if (coordinator['parent_id'] == null) {
+                 programList.add(coordinator['name']);
+                 //   programId.add(coordinator['id']);
+               }
+             }
+             // print("hgcggddfsdfuvgvhh"+programId.toString());
+             // print("hgcggddfsdfuvgvhh"+programId.toString());
+           });
+
+
+         } else {
+           setState(() {
+             error = 'Failed to fetch data. ${responseData['message']}';
+             //   isLoading = false;
+           });
+         }
+       } catch (e) {
+         setState(() {
+           error = 'Failed to fetch data. Please try again.';
+           //   isLoading = false;
+         });
+       }
+     }
+     Future<void> _selectDate(BuildContext context) async {
+       final DateTime? picked = await showDatePicker(
+         context: context,
+         initialDate: DateTime.now(),
+         firstDate: DateTime(2000),
+         lastDate: DateTime(2101),
+         builder: (BuildContext context, Widget? child) {
+           return MediaQuery(
+             data: MediaQuery.of(context).copyWith(textScaleFactor: 0.80), // Reduce overall scale
+             child: Theme(
+               data: Theme.of(context).copyWith(
+                 datePickerTheme: DatePickerThemeData(
+                   dayStyle: TextStyle(fontSize: 15),
+                   weekdayStyle: TextStyle(fontSize: 11),
+                   yearStyle: TextStyle(fontSize: 11),
+                   headerHeadlineStyle: TextStyle(fontSize: 13),
+                   headerHelpStyle: TextStyle(fontSize: 10),
+                 ),
+               ),
+               child: child!,
+             ),
+           );
+         },
+       );
+
+       if (picked != null) {
+         setState(() {
+           var _dateController = DateFormat('yyyy-MM-dd').format(picked);
+         });
+       }
+     }
     Widget _buildText(String title, dynamic value) {
       return Row(
         crossAxisAlignment: CrossAxisAlignment.start,
