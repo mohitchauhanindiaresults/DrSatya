@@ -104,8 +104,8 @@ import '../../utils/Constant.dart';
                 onChanged: (value) {
                   filterMemberList(value);
                 },
-                decoration: InputDecoration(
-                  labelText: 'Search',
+                decoration: InputDecoration (
+                  labelText: 'Search To Create New Lead',
                   prefixIcon: Icon(Icons.search),
                 ),
               ),
@@ -149,22 +149,22 @@ import '../../utils/Constant.dart';
                             CrossAxisAlignment.start,
                             children: [
                               Text('Sr No.: ${member['center_id']}'),
-                              RichText(
-                                text: TextSpan(
-                                  children: [
-                                    TextSpan(
-                                      text: 'Lead Status: ', // Regular text
-                                      style: TextStyle(color: Colors.black), // Color for regular text
-                                    ),
-                                    TextSpan(
-                                      text: '${member['followup_status'] ?? ''}',
-                                      style: TextStyle(
-                                        color: Utils.getLeadStatusColor(member['followup_status']),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
+                              // RichText(
+                              //   text: TextSpan(
+                              //     children: [
+                              //       // TextSpan(
+                              //       //   text: 'Lead Status: ', // Regular text
+                              //       //   style: TextStyle(color: Colors.black), // Color for regular text
+                              //       // ),
+                              //       // TextSpan(
+                              //       //   text: '${member['followup_status'] ?? ''}',
+                              //       //   style: TextStyle(
+                              //       //     color: Utils.getLeadStatusColor(member['followup_status']),
+                              //       //   ),
+                              //       // ),
+                              //     ],
+                              //   ),
+                              // ),
 
                               Text('Mobile: ${member['mobile']}'),
                             ],
