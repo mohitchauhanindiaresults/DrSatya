@@ -80,7 +80,8 @@ class _FollowupListScreenState extends State<FollowupListScreen> {
               padding: const EdgeInsets.all(10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+                children:
+                [
                   _buildRow('Date:', item['date'] ?? 'N/A'),
                   _buildRow('Time:', _formatTime(item['time'] ?? '')),
                   _buildRow('Initial Datetime:', _formatDateTime(item['initial_datetime'] ?? '')),
@@ -88,7 +89,8 @@ class _FollowupListScreenState extends State<FollowupListScreen> {
                   _buildRow('Status:', item['status'] ?? 'N/A'),
                   _buildRow('Action Status:', item['action_status'] ?? 'N/A'),
                   _buildRow('Remark:', item['remark'] ?? 'N/A'),
-                ],
+                ]
+                ,
 
 
               ),

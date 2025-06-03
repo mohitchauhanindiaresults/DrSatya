@@ -1,17 +1,13 @@
 import 'dart:convert';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:satya_new/screens/Sales/FollowupListScreen.dart';
-import 'package:satya_new/screens/Sales/SalesFollowup.dart';
 import 'package:satya_new/utils/Constant.dart';
 import 'package:satya_new/utils/Utils.dart';
-import 'package:sn_progress_dialog/progress_dialog.dart';
-
 import '../../utils/ApiInterceptor.dart';
-import '../Yoga/AddNewFollowUpScreen.dart';
+import 'AddNewFollowUpScreen.dart';
 
 class SalesListing extends StatefulWidget {
   @override
@@ -276,35 +272,34 @@ class _SalesListingState extends State<SalesListing> {
                           return Center(child: Text('Error loading data'));
                         } else {
                           salesList = snapshot.data!['sales'];
-                          filteredSalesList =
-                              List.from(salesList); // or [...salesList];
+                          filteredSalesList = List.from(salesList);
 
-                          // Filtering logic
-                          print(selectedStatus);
-                          print("object23123");
+// Apply dropdown filters
                           if (selectedStatus.isNotEmpty) {
                             filteredSalesList = filteredSalesList
-                                .where(
-                                    (sale) => sale['program'] == selectedStatus)
+                                .where((sale) => sale['program'] == selectedStatus)
                                 .toList();
                           }
                           if (selectedPotentiality.isNotEmpty) {
                             filteredSalesList = filteredSalesList
-                                .where((sale) =>
-                                    sale['potentiality'] ==
-                                    selectedPotentiality)
+                                .where((sale) => sale['potentiality'] == selectedPotentiality)
                                 .toList();
                           }
                           if (selectedSource.isNotEmpty) {
                             filteredSalesList = filteredSalesList
-                                .where(
-                                    (sale) => sale['source'] == selectedSource)
+                                .where((sale) => sale['source'] == selectedSource)
                                 .toList();
                           }
-                          // else{
-                          //   filteredSalesList = List.from(salesList);
-                          //   print("wdwwcsscwq");
-                          // }
+
+                          String query = _searchController.text.trim().toLowerCase();
+                          if (query.isNotEmpty) {
+                            filteredSalesList = filteredSalesList.where((sale) {
+                              String name = (sale['name'] ?? '').toString().toLowerCase();
+                              String mobile = (sale['mobile'] ?? '').toString().toLowerCase();
+                              return name.contains(query) || mobile.contains(query);
+                            }).toList();
+                          }
+
 
                           return ListView.builder(
                             itemCount: filteredSalesList.length,

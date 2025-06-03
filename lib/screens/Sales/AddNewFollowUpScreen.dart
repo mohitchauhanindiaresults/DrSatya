@@ -2,8 +2,10 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
+import 'package:satya_new/screens/Billing/BillingSelection.dart';
 import 'package:satya_new/screens/Sales/SalesListing.dart';
 import 'package:satya_new/utils/Constant.dart';
+import 'package:satya_new/utils/Utils.dart';
 import '../../utils/ApiInterceptor.dart';
 
 class AddNewFollowUpScreen extends StatefulWidget {
@@ -79,7 +81,12 @@ class _AddNewFollowUpScreenState extends State<AddNewFollowUpScreen> {
       if (response.statusCode == 200 && response.data['status']=='success') {
         print('✅ Follow-up updated successfully: ${response.data}');
         Fluttertoast.showToast(msg: response.data['message'], toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, backgroundColor: Colors.grey, textColor: Colors.white);
-        Navigator.push(context, MaterialPageRoute(builder: (context) => SalesListing()));
+        if(selectedAction=="Billing"){
+          Utils.navigateToPage(context, BilllingSelection());
+        }else{
+          Navigator.push(context, MaterialPageRoute(builder: (context) => SalesListing()));
+
+        }
 
       } else {
         Fluttertoast.showToast(msg: response.data['message'], toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, backgroundColor: Colors.grey, textColor: Colors.white);
@@ -97,6 +104,7 @@ class _AddNewFollowUpScreenState extends State<AddNewFollowUpScreen> {
 
 
   void _handleSubmit() {
+
     if (_dateController.text.isEmpty ||
         _timeController.text.isEmpty ||
         _remarkController.text.isEmpty ||
