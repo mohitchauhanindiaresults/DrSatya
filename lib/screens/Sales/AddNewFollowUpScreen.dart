@@ -24,7 +24,7 @@ class _AddNewFollowUpScreenState extends State<AddNewFollowUpScreen> {
   String selectedAction = '';
   final Dio _dio = ApiInterceptor.createDio();
   bool isLoading = false;
-
+  bool buttonVisibity=false;
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -105,17 +105,38 @@ class _AddNewFollowUpScreenState extends State<AddNewFollowUpScreen> {
 
   void _handleSubmit() {
 
-    if (_dateController.text.isEmpty ||
+    if(selectedAction=="Next Follow Up"){
+      if (
+     _dateController.text.isEmpty ||
         _timeController.text.isEmpty ||
-        _remarkController.text.isEmpty ||
-        selectedAction.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please fill all fields')),
-      );
-      return;
-    } else {
-      updateFollowUpStatus();
+      _remarkController.text.isEmpty ||
+          selectedAction.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Please fill all fields')),
+        );
+        return;
+      } else {
+        updateFollowUpStatus();
+      }
+
+
+    }else{
+
+      if (
+      //_dateController.text.isEmpty ||
+      //   _timeController.text.isEmpty ||
+      _remarkController.text.isEmpty ||
+          selectedAction.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Please fill all fields')),
+        );
+        return;
+      } else {
+        updateFollowUpStatus();
+      }
     }
+
+
   }
 
   @override
@@ -149,35 +170,41 @@ class _AddNewFollowUpScreenState extends State<AddNewFollowUpScreen> {
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  TextField(
-                    controller: _dateController,
-                    readOnly: true,
-                    onTap: () => _selectDate(context),
-                    style: TextStyle(fontSize: 14),
-                    decoration: InputDecoration(
-                      labelText: 'Select Date',
-                      labelStyle: TextStyle(fontSize: 14),
-                      contentPadding:
-                      EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8)),
-                      suffixIcon: Icon(Icons.calendar_today, size: 18),
+                  Visibility(
+                    visible: buttonVisibity,
+                    child: TextField(
+                      controller: _dateController,
+                      readOnly: true,
+                      onTap: () => _selectDate(context),
+                      style: TextStyle(fontSize: 14),
+                      decoration: InputDecoration(
+                        labelText: 'Select Date',
+                        labelStyle: TextStyle(fontSize: 14),
+                        contentPadding:
+                        EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8)),
+                        suffixIcon: Icon(Icons.calendar_today, size: 18),
+                      ),
                     ),
                   ),
                   SizedBox(height: 12),
-                  TextField(
-                    controller: _timeController,
-                    readOnly: true,
-                    onTap: () => _selectTime(context),
-                    style: TextStyle(fontSize: 14),
-                    decoration: InputDecoration(
-                      labelText: 'Select Time',
-                      labelStyle: TextStyle(fontSize: 14),
-                      contentPadding:
-                      EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8)),
-                      suffixIcon: Icon(Icons.access_time, size: 18),
+                  Visibility(
+                    visible: buttonVisibity,
+                    child: TextField(
+                      controller: _timeController,
+                      readOnly: true,
+                      onTap: () => _selectTime(context),
+                      style: TextStyle(fontSize: 14),
+                      decoration: InputDecoration(
+                        labelText: 'Select Time',
+                        labelStyle: TextStyle(fontSize: 14),
+                        contentPadding:
+                        EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8)),
+                        suffixIcon: Icon(Icons.access_time, size: 18),
+                      ),
                     ),
                   ),
                   SizedBox(height: 12),
@@ -216,6 +243,12 @@ class _AddNewFollowUpScreenState extends State<AddNewFollowUpScreen> {
                     onChanged: (String? newValue) {
                       setState(() {
                         selectedAction = newValue ?? '';
+                        if(selectedAction=="Next Follow Up"){
+                          buttonVisibity=true;
+                        }else{
+                          buttonVisibity=false;
+                        }
+
                       });
                     },
                   ),
